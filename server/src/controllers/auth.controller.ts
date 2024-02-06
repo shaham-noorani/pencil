@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { OAuth2Client } from "google-auth-library";
 import {
-  getEmployeeInformationFromToken,
+  getUserInformationFromToken as getUserInformationFromToken,
   refreshCredentials,
 } from "../services/auth.service";
 
@@ -17,7 +17,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
   try {
     const { tokens } = await client.getToken(req.body.code);
 
-    const { email, name } = await getEmployeeInformationFromToken(
+    const { email, name } = await getUserInformationFromToken(
       tokens.id_token as string
     );
 
@@ -35,10 +35,10 @@ export const googleRefreshToken = async (req: Request, res: Response) => {
   try {
     const { credentials } = await refreshCredentials(refreshToken);
 
-    return {
+    res.json({
       id_token: credentials.id_token as string,
       refresh_token: credentials.refresh_token as string,
-    };
+    });
   } catch (error) {
     console.error("Token refresh error:", error);
     res.status(500).json({ error: "Failed to refresh token" });
@@ -48,7 +48,7 @@ export const googleRefreshToken = async (req: Request, res: Response) => {
 export const getMe = async (req: Request, res: Response) => {
   const idToken = req.headers.authorization?.split(" ")[1]; // Bearer <token>
 
-  const userInfo = await getEmployeeInformationFromToken(idToken as string);
+  const userInfo = await getUserInformationFromToken(idToken as string);
 
   try {
     // actually pull the user from DB, this is just a placeholder

@@ -6,7 +6,7 @@ import { Outlet } from "react-router";
 import { Spinner } from "@chakra-ui/react";
 
 const PersistAuth = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const refresh = useRefreshToken();
   const { auth }: any = useAuth();
   const me = useMe();

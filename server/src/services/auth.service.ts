@@ -1,8 +1,9 @@
+import { NextFunction, Request, Response } from "express";
 import { OAuth2Client, UserRefreshClient } from "google-auth-library";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-export const getEmployeeInformationFromToken = async (idToken: string) => {
+export const getUserInformationFromToken = async (idToken: string) => {
   const ticket = await client.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID,
@@ -26,4 +27,31 @@ export const refreshCredentials = async (refreshToken: string) => {
   );
 
   return await user.refreshAccessToken();
+};
+
+export const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  const idToken = authHeader.split(" ")[1]; // Bearer <token>
+
+  if (!idToken) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+
+  let email: string;
+  try {
+    email = (await getUserInformationFromToken(idToken)).email;
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+
+  next();
 };

@@ -33,8 +33,7 @@ const LoginButton = () => {
 
       setIsLoading(false);
 
-      const { from } = location.state || { from: { pathname: "/" } };
-      navigate(from);
+      navigate("/dashboard");
     },
     flow: "auth-code",
     scope:
