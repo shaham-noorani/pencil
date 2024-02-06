@@ -4,7 +4,8 @@ import {
     getAllUsers,
     getUserById,
     getUserByEmail,
-    updateUser,
+    updateUserName,
+    updateUserEmail,
     deleteUser,
     createUser,
 } from "../controllers/user.controller";
@@ -15,7 +16,8 @@ userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
 userRouter.get("/:email", getUserByEmail);
 userRouter.post("/", createUser);
-userRouter.put("/:id", updateUser);
+userRouter.put("/:id", updateUserName);
+userRouter.put("/:email", updateUserEmail);
 userRouter.delete("/:id", deleteUser);
 
 

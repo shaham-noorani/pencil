@@ -5,24 +5,50 @@ import { pool } from "../db";
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const result = await pool.query("SELECT * FROM users");
-        const examples = result.rows;
-        res.status(200).json(examples);
+        const users = result.rows;
+        res.status(200).json(users);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
 
 export const getUserById = async (req: Request, res: Response) => {
-    return res.status(501).json({ message: "Not Implemented" });
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE id = $1", [
+            req.params.id,
+        ]);
+        const user = result.rows[0];
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    } catch (error: any) {
+            res.status(500).json({ message: error.message });
+    }
 };
 
 //May potentially help with Oauth stuff
 export const getUserByEmail = async (req: Request, res: Response) => {
-    return res.status(501).json({ message: "Not Implemented" });
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+            req.params.email,
+        ]);
+        const user = result.rows[0];
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    } catch (error: any) {
+            res.status(500).json({ message: error.message });
+    }
 };
 
 //Update Users
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUserName = async (req: Request, res: Response) => {
+    return res.status(501).json({ message: "Not Implemented" });
+};
+
+export const updateUserEmail = async (req: Request, res: Response) => {
     return res.status(501).json({ message: "Not Implemented" });
 };
 
