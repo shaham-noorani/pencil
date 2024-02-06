@@ -45,11 +45,37 @@ export const getUserByEmail = async (req: Request, res: Response) => {
 
 //Update Users
 export const updateUserName = async (req: Request, res: Response) => {
-    return res.status(501).json({ message: "Not Implemented" });
+    try {
+        const result = await pool.query(
+          "UPDATE users SET name = $1 WHERE id = $2 RETURNING *",
+          [req.body.name, req.params.id]
+        );
+        const user = result.rows[0];
+    
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+      } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 export const updateUserEmail = async (req: Request, res: Response) => {
-    return res.status(501).json({ message: "Not Implemented" });
+    try {
+        const result = await pool.query(
+          "UPDATE users SET email = $1 WHERE id = $2 RETURNING *",
+          [req.body.email, req.params.id]
+        );
+        const user = result.rows[0];
+    
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+      } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 //Delete Users
@@ -59,5 +85,15 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 //Create Users
 export const createUser = async (req: Request, res: Response) => {
-    return res.status(501).json({ message: "Not Implemented" });
+    try {
+        const result = await pool.query(
+          "INSERT INTO users (name) VALUES ($1) RETURNING *",
+          [req.body.name]
+        );
+        const user = result.rows[0];
+    
+        res.status(201).json(user);
+      } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
 };
