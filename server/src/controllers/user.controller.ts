@@ -54,7 +54,6 @@ export const updateUserEmail = async (req: Request, res: Response) => {
             [req.body.email]
         );
         const nExistingEmails = Number(existingEmails.rows[0].count);
-        console.log(nExistingEmails)
         if (nExistingEmails > 0) {
             return res.status(409).json({ message: "Email already exists" });
         }
@@ -101,7 +100,6 @@ export const createUser = async (req: Request, res: Response) => {
             [req.body.email]
         );
         const nExistingEmails = Number(existingEmails.rows[0].count);
-        console.log(nExistingEmails)
         if (nExistingEmails > 0) {
             return res.status(409).json({ message: "Email already exists" });
         }
