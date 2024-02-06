@@ -28,21 +28,6 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 
-export const getUserByEmail = async (req: Request, res: Response) => {
-    try {
-        const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-            req.params.email,
-        ]);
-        const user = result.rows[0];
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
-    } catch (error: any) {
-            res.status(500).json({ message: error.message });
-    }
-};
-
 //Update Users
 export const updateUserName = async (req: Request, res: Response) => {
     try {
