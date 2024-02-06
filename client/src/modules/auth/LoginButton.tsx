@@ -3,14 +3,13 @@ import { useGoogleLogin } from "@react-oauth/google";
 import useAuth from "./useAuth";
 import axios from "axios";
 import { Button, useToast } from "@chakra-ui/react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const LoginButton = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth }: any = useAuth();
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const url = import.meta.env.PROD ? "" : "http://localhost:3000";
 

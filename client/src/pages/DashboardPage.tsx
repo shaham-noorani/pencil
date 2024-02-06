@@ -9,11 +9,9 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 
-import { Link } from "react-router-dom";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-
-const Dashboard = () => {
+const DashboardPage = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const getAllExamples = async () => {
@@ -49,22 +47,8 @@ const Dashboard = () => {
       </Box>
 
       <Spacer mt={10} />
-      <Button
-        as={Link}
-        to="/login"
-        size="lg"
-        color={"red"}
-        onClick={() => {
-          localStorage.removeItem("idToken");
-          localStorage.removeItem("refreshToken");
-
-          window.location.reload();
-        }}
-      >
-        Logout
-      </Button>
     </Box>
   );
 };
 
-export default Dashboard;
+export default DashboardPage;
