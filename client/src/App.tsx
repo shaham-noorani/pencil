@@ -1,12 +1,6 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-import "./App.css";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./modules/dashboard/Dashboard";
+import DashboardPage from "./pages/DashboardPage";
 import PersistAuth from "./modules/auth/PersistAuth";
 import RequireAuth from "./modules/auth/RequireAuth";
 
@@ -18,7 +12,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<PersistAuth />}>
             <Route element={<RequireAuth />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="*" element={<DashboardPage />} />
             </Route>
           </Route>
         </Routes>
