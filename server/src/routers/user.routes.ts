@@ -3,7 +3,6 @@ import express from "express";
 import {
     getAllUsers,
     getUserById,
-    getUserByEmail,
     updateUserName,
     updateUserEmail,
     deleteUser,
@@ -14,7 +13,6 @@ const userRouter = express.Router();
 
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
-userRouter.get("/email/:id", getUserByEmail);
 userRouter.post("/", createUser);
 userRouter.put("/:id", updateUserName);
 userRouter.put("/email/:id", updateUserEmail);
