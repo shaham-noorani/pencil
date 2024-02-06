@@ -27,7 +27,7 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 };
 
-//May potentially help with Oauth stuff
+
 export const getUserByEmail = async (req: Request, res: Response) => {
     try {
         const result = await pool.query("SELECT * FROM users WHERE email = $1", [
@@ -63,6 +63,17 @@ export const updateUserName = async (req: Request, res: Response) => {
 
 export const updateUserEmail = async (req: Request, res: Response) => {
     try {
+
+        //Check if email already exists
+        const existingEmails = await pool.query( "SELECT COUNT(*) FROM users WHERE email = $1",
+            [req.body.email]
+        );
+        const nExistingEmails = existingEmails.rows[0];
+
+        if (nExistingEmails > 0) {
+            return res.status(409).json({ message: "Email already exists" });
+        }
+
         const result = await pool.query(
             "UPDATE users SET email = $1 WHERE id = $2 RETURNING *",
             [req.body.email, req.params.id]
@@ -99,9 +110,20 @@ export const deleteUser = async (req: Request, res: Response) => {
 //Create Users
 export const createUser = async (req: Request, res: Response) => {
     try {
+
+        //Check if email already exists
+        const existingEmails = await pool.query( "SELECT COUNT(*) FROM users WHERE email = $1",
+            [req.body.email]
+        );
+        const nExistingEmails = existingEmails.rows[0];
+
+        if (nExistingEmails > 0) {
+            return res.status(409).json({ message: "Email already exists" });
+        }
+
         const result = await pool.query(
-            "INSERT INTO users (name) VALUES ($1) RETURNING *",
-            [req.body.name]
+            "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
+            [req.body.name, req.body.email]
         );
         const user = result.rows[0];
     
