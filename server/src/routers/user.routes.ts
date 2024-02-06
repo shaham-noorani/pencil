@@ -14,10 +14,10 @@ const userRouter = express.Router();
 
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
-userRouter.get("/:email", getUserByEmail);
+userRouter.get("/email/:id", getUserByEmail);
 userRouter.post("/", createUser);
 userRouter.put("/:id", updateUserName);
-userRouter.put("/:email", updateUserEmail);
+userRouter.put("/email/:id", updateUserEmail);
 userRouter.delete("/:id", deleteUser);
 
 
