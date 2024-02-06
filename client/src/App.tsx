@@ -5,8 +5,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./login/LoginPage";
-import Dashboard from "./dashboard/Dashboard";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./modules/dashboard/Dashboard";
 
 function App() {
   return (

@@ -1,13 +1,29 @@
 import React from "react";
-import ReactDOM from "react-dom";
+
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 import App from "./App";
 import { ChakraWrapper } from "./chakra";
+import { createRoot } from "react-dom/client";
 
-ReactDOM.render(
-  <ChakraWrapper>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </ChakraWrapper>,
-  document.getElementById("root")
+import { AuthProvider } from "./modules/auth/AuthProvider";
+import { UserProvider } from "./contexts/UserProvider";
+
+const clientId =
+  "1001884435131-9rt55svhet3mkcuuh4fp8mqcu3thcver.apps.googleusercontent.com";
+
+const container = document.getElementById("root");
+const root = createRoot(container as any);
+root.render(
+  <React.StrictMode>
+    <GoogleOAuthProvider clientId={clientId}>
+      <AuthProvider>
+        <UserProvider>
+          <ChakraWrapper>
+            <App />
+          </ChakraWrapper>
+        </UserProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
+  </React.StrictMode>
 );
