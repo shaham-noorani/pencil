@@ -47,7 +47,7 @@ const LoginButton = () => {
 
   return (
     <Button onClick={googleLogin} isLoading={isLoading} size={"lg"}>
-      Sign In with Google SSO
+      Sign In with Google
     </Button>
   );
 };

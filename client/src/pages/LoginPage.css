@@ -1,0 +1,358 @@
+/* LoginPage.css */
+.login-button {
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+    transform: scale(0);
+    opacity: 0;
+}
+
+.pencil-text {
+    color: white;
+    font-size: 40px;
+    letter-spacing: 10px;
+    align-self: flex-start;
+    padding-left: 10px;
+    transition: all ease-in-out;
+}
+
+.circle-container {
+    line-height: 0;
+    align-self: flex-start;
+    padding-left: 10px;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 5px 5px;
+    position: relative;
+    border-color: #222222;
+    border-width: thin;
+    display: inline-block;
+}
+
+.circle.red-circle {
+    background-color: #ED6762;
+    z-index: 3;
+}
+
+.circle.gray-circle {
+    background-color: #A8A8A8;
+    z-index: 2;
+}
+
+.circle.yellow-circle {
+    background-color: #F6BF60;
+    z-index: 1;
+}
+
+/* Styles specific to stage0 */
+.circle-container.stage0 {
+    display: flex;
+    align-items: flex-start;
+}
+
+.pencil-text.stage0 {
+    display: flex;
+    align-items: flex-start;
+}
+
+.red-circle.stage0 {
+    margin-right: 8px; /* Adjust the space between circles as needed */
+    opacity: 1;
+}
+
+.gray-circle.stage0 {
+    margin-right: 8px; /* Adjust the space between circles as needed */
+    opacity: 1;
+}
+
+.yellow-circle.stage0 {
+    opacity: 1;
+}
+
+/* Styles specific to stage1 */
+@keyframes moveRedCircleToStage1 {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes moveYellowCircleToStage1 {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-60px);
+    }
+  }
+
+  @keyframes moveGrayCircleToStage1 {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-30px);
+    }
+  }
+
+  @keyframes moveLetterLToStage1 {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-165px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes moveLetterIToStage1 {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-125px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes moveLetterCToStage1 {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes moveLetterNToStage1 {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-65px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes moveLetterEToStage1 {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-30px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes moveLetterPToStage1 {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(0, 0);
+    }
+  }
+
+  @keyframes scaleLetterDownToDisappear {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(0);
+    }
+  }
+
+  .circle.red-circle.stage1 {
+    animation: moveRedCircleToStage1 1s forwards;
+  }
+
+  .circle.yellow-circle.stage1 {
+    animation: moveYellowCircleToStage1 1.5s forwards;
+  }
+  
+  .circle.gray-circle.stage1 {
+    animation: moveGrayCircleToStage1 1.1s 0.2s forwards;
+  }
+  
+  .logoLetterL.stage1 {
+    animation: moveLetterLToStage1 1s forwards, scaleLetterDownToDisappear 0.01s 1s forwards;
+  }
+
+  .logoLetterI.stage1 {
+    animation: moveLetterIToStage1 0.8s 0.2s forwards, scaleLetterDownToDisappear 0.01s 1s forwards;
+  }
+
+  .logoLetterC.stage1 {
+    animation: moveLetterCToStage1 0.6s 0.4s forwards, scaleLetterDownToDisappear 0.01s 1s forwards;
+  }
+
+  .logoLetterN.stage1 {
+    animation: moveLetterNToStage1 0.4s 0.6s forwards, scaleLetterDownToDisappear 0.01s 1s forwards;
+  }
+
+  .logoLetterE.stage1 {
+    animation: moveLetterEToStage1 0.2s 0.8s forwards, scaleLetterDownToDisappear 0.01s 1s forwards;
+  }
+
+  .logoLetterP.stage1 {
+    animation: moveLetterPToStage1 1s forwards;
+  }
+  
+  /* Styles specific to stage2 */
+  .logoLetterL.stage2,
+  .logoLetterI.stage2,
+  .logoLetterC.stage2,
+  .logoLetterN.stage2,
+  .logoLetterE.stage2,
+  .logoLetterL.stage3,
+  .logoLetterI.stage3,
+  .logoLetterC.stage3,
+  .logoLetterN.stage3,
+  .logoLetterE.stage3 {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  .circle-container.stage2 {
+    display: flex;
+    align-items: center;
+  }
+
+  .pencil-text.stage2,
+  .pencil-text.stage3 {
+    display: flex;
+    align-items: center;
+  }
+
+  @keyframes scaleAndMovePToStage2 {
+    from {
+      transform: translate(0, 0) scale(1);
+    }
+    to {
+      transform: translate(210px, -40px) scale(3);
+    }
+  }
+
+  @keyframes moveRedCircleToStage2 {
+    from {
+        transform: translate(0px, 0px);
+    }
+    to {
+        transform: translate(150px, -23px);
+    }
+  }
+
+  @keyframes moveGrayCircleToStage2 {
+    from {
+      transform: translate(-30px, 0px);
+    }
+    to {
+      transform: translate(120px, -23px);
+    }
+  }
+
+  @keyframes moveYellowCircleToStage2 {
+    from {
+        transform: translate(-60px, 0px);
+    }
+    to {
+        transform: translate(90px, -23px);
+    }
+  }
+
+  .logoLetterP.stage2 {
+    animation: scaleAndMovePToStage2 1s forwards;
+  }
+  
+  .circle.red-circle.stage2 {
+    animation: moveRedCircleToStage2 1s forwards;
+  }
+  
+  .circle.gray-circle.stage2 {
+    animation: moveGrayCircleToStage2 1s forwards;
+  }
+  
+  .circle.yellow-circle.stage2 {
+    animation: moveYellowCircleToStage2 1s forwards;
+  }
+
+  /* Styles specific to stage3 */
+@keyframes fadeLoginButtonIntoExistence {
+    from {
+        opacity: 0;
+        transform: scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes moveRedCircleToStage3 {
+    from {
+        transform: translate(150px, -23px);
+    }
+    to {
+        transform: translate(150px, -23px);
+    }
+}
+
+@keyframes moveGrayCircleToStage3 {
+    from {
+        transform: translate(120px, -23px);
+    }
+    to {
+        transform: translate(120px, 7px);
+    }
+}
+
+@keyframes moveYellowCircleToStage3 {
+    from {
+        transform: translate(90px, -23px);
+    }
+    to {
+        transform: translate(90px, 37px);
+    }
+}
+
+@keyframes moveLetterPToStage3 {
+    from {
+        transform: translate(210px, -40px) scale(3);
+    }
+    to {
+        transform: translate(210px, -40px) scale(3);
+    }
+}
+
+.login-button.stage3 {
+    animation: fadeLoginButtonIntoExistence 0.5s 0.5s forwards;
+}
+
+.logoLetterP.stage3 {
+    animation: moveLetterPToStage3 0.1s forwards;
+}
+
+.circle.red-circle.stage3 {
+    animation: moveRedCircleToStage3 0.1s forwards;
+}
+
+.circle.gray-circle.stage3 {
+    animation: moveGrayCircleToStage3 0.66s forwards;
+}
+
+.circle.yellow-circle.stage3 {
+    animation: moveYellowCircleToStage3 1s forwards;
+}
