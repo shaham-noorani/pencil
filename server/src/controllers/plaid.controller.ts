@@ -83,7 +83,7 @@ export const createLinkToken = async (req: Request, res: Response) => {
     const createTokenResponse = await client.linkTokenCreate(request);
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
-    //res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -96,6 +96,7 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
 
     // These values should be saved to a persistent database and
     // associated with the currently signed-in user
+    //currently storing them locally
     ACCESS_TOKEN = response.data.access_token;
     ITEM_ID = response.data.item_id;
 
