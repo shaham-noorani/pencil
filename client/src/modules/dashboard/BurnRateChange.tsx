@@ -1,11 +1,11 @@
-import { HStack, Text, Box } from '@chakra-ui/react';
+import { HStack, Text } from '@chakra-ui/react';
 
-interface ProjectedSavingsChangeProps {
+interface BurnRateChangeProps {
   projectedSavings: number;
   targetSavings: number;
 }
 
-const DashboardMiddleComponentProjectedSavingsChangeComponent = ({ projectedSavings, targetSavings }: ProjectedSavingsChangeProps) => {
+const BurnRateChange = ({ projectedSavings, targetSavings }: BurnRateChangeProps) => {
   const difference = projectedSavings - targetSavings;
   const projectedVsTargetAsPercent = (difference / targetSavings) * 100;
   const isPositive = difference >= 0;
@@ -23,4 +23,4 @@ const DashboardMiddleComponentProjectedSavingsChangeComponent = ({ projectedSavi
   );
 };
 
-export default DashboardMiddleComponentProjectedSavingsChangeComponent;
+export default BurnRateChange;

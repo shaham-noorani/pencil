@@ -4,7 +4,7 @@ interface ProjectedSavingsValueProps {
   projectedSavings: number;
 }
 
-const DashboardMiddleComponentProjectedSavingsValueComponent = ({ projectedSavings }: ProjectedSavingsValueProps) => {
+const BurnRateValue = ({ projectedSavings }: ProjectedSavingsValueProps) => {
   return (
     <Box pl={4} pr={4} pb={4}>
       <Text color="white" fontSize="2xl" fontWeight="bold">
@@ -14,4 +14,4 @@ const DashboardMiddleComponentProjectedSavingsValueComponent = ({ projectedSavin
   );
 };
 
-export default DashboardMiddleComponentProjectedSavingsValueComponent;
+export default BurnRateValue;
