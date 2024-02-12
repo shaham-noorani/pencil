@@ -1,7 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
 
-const DashboardHeader = () => {
+const HeaderNetWorth = () => {
   const today = format(new Date(), "EEEE, MMMM do");
 
   return (
@@ -22,4 +22,4 @@ const DashboardHeader = () => {
   );
 };
 
-export default DashboardHeader;
+export default HeaderNetWorth;
