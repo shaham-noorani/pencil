@@ -1,32 +1,59 @@
-import { useState } from 'react';
-import { Box, Flex, Text, VStack, Collapse, IconButton } from '@chakra-ui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
+import { useState } from "react";
+import {
+  Box,
+  Flex,
+  Text,
+  VStack,
+  Collapse,
+  IconButton,
+} from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 interface Account {
-    bankName: string;
-    last4CCNumber: string;
-    bankNickname: string;
-    value: number;
+  bankName: string;
+  last4CCNumber: string;
+  bankNickname: string;
+  value: number;
 }
 interface CashTabComponentProps {
-    accounts: Account[];
-    label: string;
-    totalValue: number;
+  accounts: Account[];
+  label: string;
+  totalValue: number;
 }
 
-const CashTabComponent = ({ accounts, label, totalValue }: CashTabComponentProps) => {
+const CashTabComponent = ({
+  accounts,
+  label,
+  totalValue,
+}: CashTabComponentProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
   return (
     <VStack align="stretch" spacing={4}>
-      <Flex justifyContent="space-between" p={4} bg="gray.700" borderRadius="md" alignItems="center">
-        <Text fontWeight="bold" color="white">{label}</Text>
+      <Flex
+        justifyContent="space-between"
+        p={4}
+        bg="gray.700"
+        borderRadius="md"
+        alignItems="center"
+      >
+        <Text fontWeight="bold" color="white">
+          {label}
+        </Text>
         <Flex align="center">
-          <Text color="white" mr={2}>${totalValue.toLocaleString()}</Text>
+          <Text color="white" mr={2}>
+            ${totalValue.toLocaleString()}
+          </Text>
           <IconButton
-            icon={isOpen ? <ChevronUpIcon color="white" /> : <ChevronDownIcon color="white"/>}
+            icon={
+              isOpen ? (
+                <ChevronUpIcon color="white" />
+              ) : (
+                <ChevronDownIcon color="white" />
+              )
+            }
             aria-label={isOpen ? "Collapse" : "Expand"}
             onClick={handleToggle}
             variant="ghost"
@@ -38,8 +65,12 @@ const CashTabComponent = ({ accounts, label, totalValue }: CashTabComponentProps
         <VStack p={4} spacing={4} align="stretch">
           {accounts.map((account, index) => (
             <Box key={index} p={3} bg="gray.600" borderRadius="md">
-              <Text color="white">{account.bankNickname} - ${account.value.toLocaleString()}</Text>
-              <Text color="gray.400">{account.bankName} (...{account.last4CCNumber})</Text>
+              <Text color="white">
+                {account.bankNickname} - ${account.value.toLocaleString()}
+              </Text>
+              <Text color="gray.400">
+                {account.bankName} (...{account.last4CCNumber})
+              </Text>
             </Box>
           ))}
         </VStack>

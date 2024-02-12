@@ -35,9 +35,9 @@ const LoginPage = () => {
       <Box line-height="0px" width="full">
         {/* Circle container for the 3 circles */}
         <Box className={`circle-container stage${stage}`}>
-          <Box className={`circle red-circle stage${stage}`}/>
-          <Box className={`circle gray-circle stage${stage}`}/>
-          <Box className={`circle yellow-circle stage${stage}`}/>
+          <Box className={`circle red-circle stage${stage}`} />
+          <Box className={`circle gray-circle stage${stage}`} />
+          <Box className={`circle yellow-circle stage${stage}`} />
         </Box>
 
         <Text className={`pencil-text stage${stage}`}>

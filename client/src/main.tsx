@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client";
 
 import { AuthProvider } from "./modules/auth/AuthProvider";
 import { UserProvider } from "./contexts/UserProvider";
-import './main.css'
+import "./main.css";
 
 const clientId =
   "1001884435131-9rt55svhet3mkcuuh4fp8mqcu3thcver.apps.googleusercontent.com";
@@ -26,5 +26,5 @@ root.render(
         </UserProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

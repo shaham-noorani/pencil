@@ -1,19 +1,19 @@
-import { createContext, useState, ReactNode } from "react"
+import { createContext, useState, ReactNode } from "react";
 
 interface AuthContextProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
-const AuthContext = createContext({})
+const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }: AuthContextProps) => {
-  const [auth, setAuth] = useState({})
+  const [auth, setAuth] = useState({});
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export default AuthContext
+export default AuthContext;

@@ -1,38 +1,54 @@
-import { Box } from '@chakra-ui/react';
+import { Box } from "@chakra-ui/react";
+import dayjs from "dayjs";
+
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  ResponsiveContainer,
   Tooltip,
-  Legend
-} from 'recharts';
-import dayjs from 'dayjs';
+  ResponsiveContainer,
+} from "recharts";
 
 // Constants and calculations as previously defined
 const cashBalanceAugust = 15000;
-const pencilStartDate = '2023-10-01';
+const pencilStartDate = "2023-10-01";
 const cashBalancePencilStartDate = 14000;
 const totalCashToday = 14500; // Assume this is imported or calculated elsewhere
 const targetSavings = 20000; // Assume this is imported
-const todayDate = dayjs().format('YYYY-MM-DD');
+const todayDate = dayjs().format("YYYY-MM-DD");
 const cashBalanceOneMonthAgo = 14200;
 
-const monthsBetweenAugAndPencilStart = dayjs(pencilStartDate).diff(dayjs('2023-08-01'), 'month', true);
-const savingsRatePerMonth = (cashBalancePencilStartDate - cashBalanceAugust) / monthsBetweenAugAndPencilStart;
-const monthsBetweenAugAndMay = dayjs('2024-05-01').diff(dayjs('2023-08-01'), 'month', true);
-const noPencilSavings = cashBalanceAugust + (savingsRatePerMonth * monthsBetweenAugAndMay);
+const monthsBetweenAugAndPencilStart = dayjs(pencilStartDate).diff(
+  dayjs("2023-08-01"),
+  "month",
+  true
+);
+const savingsRatePerMonth =
+  (cashBalancePencilStartDate - cashBalanceAugust) /
+  monthsBetweenAugAndPencilStart;
+const monthsBetweenAugAndMay = dayjs("2024-05-01").diff(
+  dayjs("2023-08-01"),
+  "month",
+  true
+);
+const noPencilSavings =
+  cashBalanceAugust + savingsRatePerMonth * monthsBetweenAugAndMay;
 
 const projectedSavingsSlope = (totalCashToday - cashBalanceOneMonthAgo) / 1; // Simplified for a one-month period
-const monthsBetweenTodayAndMay = dayjs('2024-05-01').diff(dayjs(todayDate), 'month', true);
-const projectedSavings = totalCashToday + (projectedSavingsSlope * monthsBetweenTodayAndMay);
+const monthsBetweenTodayAndMay = dayjs("2024-05-01").diff(
+  dayjs(todayDate),
+  "month",
+  true
+);
+const projectedSavings =
+  totalCashToday + projectedSavingsSlope * monthsBetweenTodayAndMay;
 
 const data = [
-  { date: '2023-08-01', cashBalance: cashBalanceAugust },
+  { date: "2023-08-01", cashBalance: cashBalanceAugust },
   { date: pencilStartDate, cashBalance: cashBalancePencilStartDate },
   { date: todayDate, cashBalance: totalCashToday },
-  { date: '2024-05-01', noPencilSavings, targetSavings, projectedSavings },
+  { date: "2024-05-01", noPencilSavings, targetSavings, projectedSavings },
 ];
 
 const LinechartProjectedSavings = () => {
@@ -48,9 +64,9 @@ const LinechartProjectedSavings = () => {
             stroke="#ffffff"
             type="number"
             domain={[data[0].date, data[data.length - 1].date]}
-            tickFormatter={(unixTime) => dayjs(unixTime).format('MMM DD')}
+            tickFormatter={(unixTime) => dayjs(unixTime).format("MMM DD")}
           />
-          <YAxis stroke="#ffffff" domain={[0, 'dataMax + 1000']} />
+          <YAxis stroke="#ffffff" domain={[0, "dataMax + 1000"]} />
           <Tooltip />
           <Line
             type="monotone"

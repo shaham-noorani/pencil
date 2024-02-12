@@ -1,19 +1,19 @@
-import { createContext, useState, ReactNode } from "react"
+import { createContext, useState, ReactNode } from "react";
 
 interface UserContextProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
-const UserContext = createContext({})
+const UserContext = createContext({});
 
 export const UserProvider = ({ children }: UserContextProps) => {
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState({});
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
-  )
-}
+  );
+};
 
-export default UserContext
+export default UserContext;
