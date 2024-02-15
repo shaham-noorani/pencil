@@ -1,25 +1,31 @@
-import React, { useEffect } from "react";
-import { Box, Heading, VStack } from "@chakra-ui/react";
-import useUser from "../hooks/useUser";
+import React, { useEffect, useState } from "react";
+import { Box, Center, Heading, Spinner, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import useMe from "../modules/auth/useMe";
 
 const BurnPage: React.FC = () => {
-  const { user }: any = useUser();
   const me = useMe();
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const refreshUser = async () => {
-      await me();
-    };
-
-    refreshUser();
-
-    if (user.burnRateGoal === null) {
-      navigate("/burn-rate-goal");
-    }
+    me().then((user) => {
+      if (user.burnRateGoal === null) {
+        navigate("/burn-rate-goal");
+      } else {
+        setLoading(false);
+      }
+    });
   }, []);
+
+  if (loading) {
+    return (
+      <Center width="100vw" height="100vh" bg="#222222">
+        <Spinner size="xl" color="white" />
+      </Center>
+    );
+  }
 
   return (
     <VStack
