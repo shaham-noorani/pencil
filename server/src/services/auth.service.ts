@@ -53,5 +53,7 @@ export const authMiddleware = async (
     return res.status(401).json({ error: "Invalid token" });
   }
 
+  req.params.email = email;
+
   next();
 };
