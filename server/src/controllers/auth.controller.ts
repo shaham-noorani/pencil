@@ -4,6 +4,7 @@ import {
   getUserInformationFromToken as getUserInformationFromToken,
   refreshCredentials,
 } from "../services/auth.service";
+import { pool } from "../db";
 
 // Initialize the Google OAuth2 client
 export const client = new OAuth2Client(
@@ -51,14 +52,18 @@ export const getMe = async (req: Request, res: Response) => {
   const userInfo = await getUserInformationFromToken(idToken as string);
 
   try {
-    // actually pull the user from DB, this is just a placeholder
+    const burnRateGoal = (
+      await pool.query("SELECT * FROM users WHERE email = $1", [userInfo.email])
+    ).rows[0].burnRateGoal;
+
     const user = {
       email: userInfo.email,
       name: userInfo.name,
       profile: userInfo.profile,
+      burnRateGoal: burnRateGoal,
     };
 
-    return { ...user };
+    res.json(user);
   } catch (err) {
     console.error("Get me error:", err);
     res.status(500).json({ error: "Failed to get user information" });

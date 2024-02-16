@@ -69,3 +69,20 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const updateUserBurnRateGoal = async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      'UPDATE users SET "burnRateGoal" = $1 WHERE email = $2 RETURNING *',
+      [req.body.burnRateGoal, req.params.email]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
