@@ -124,7 +124,7 @@ export const createSpendings = async (req: Request, res: Response) => {
       denominator += (i + 1 - mu_x) * (i + 1 - mu_x);
     }
 
-    let slope = numerator / denominator;
+    let slope = numerator / (denominator + Number.EPSILON);
     let intercept = mu_y - slope * mu_x;
 
     //Update User's slope and intercept
