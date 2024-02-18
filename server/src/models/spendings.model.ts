@@ -1,9 +1,7 @@
-export default interface User {
+export default interface Spendings {
   id: number;
-  name: string;
-  email: string;
-  budget_by_may: number;
-  date_joined: Date;
-  slope: number;
-  intercept: number;
+  start_date: Date;
+  end_date: Date;
+  spent_amount: number;
+  user_id: number;
 }
