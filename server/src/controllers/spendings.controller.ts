@@ -86,7 +86,7 @@ export const createSpendings = async (req: Request, res: Response) => {
     let end_date = req.body.end_date;
 
     //Assume spending is money spent from 7 days ago until now
-    if (req.body.start_date === undefined) {
+    if (req.body.start_date === undefined || req.body.end_date === undefined) {
       end_date = new Date();
       start_date = new Date(end_date.getTime() - 1000 * 60 * 60 * 24 * 7);
     }
