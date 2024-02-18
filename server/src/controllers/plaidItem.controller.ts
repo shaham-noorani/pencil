@@ -43,7 +43,7 @@ export const getPlaidItemsByUserId = async (req: Request, res: Response) => {
   }
 };
 
-//Delete Users
+//Delete Plaid Item
 export const deletePlaidItem = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
@@ -78,7 +78,7 @@ export const deletePlaidItemByUserId = async (req: Request, res: Response) => {
   }
 };
 
-//Create Users
+//Create Plaid Item
 export const createPlaidItem = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
