@@ -58,9 +58,11 @@ export const createUser = async (req: Request, res: Response) => {
       return res.status(409).json({ message: "Email already exists" });
     }
 
+    let dateTime = new Date();
+
     const result = await pool.query(
-      "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
-      [req.body.name, req.body.email]
+      "INSERT INTO users (name, email, burnRateGoal, slope, intercept, date_joined) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [req.body.name, req.body.email, req.body.burnRateGoal, 0, 0, dateTime]
     );
     const user = result.rows[0];
 
