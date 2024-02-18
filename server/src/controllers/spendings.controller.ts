@@ -5,8 +5,8 @@ import { pool } from "../db";
 export const getAllSpendings = async (req: Request, res: Response) => {
   try {
     const result = await pool.query("SELECT * FROM user_spendings");
-    const users = result.rows;
-    res.status(200).json(users);
+    const spent = result.rows;
+    res.status(200).json(spent);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -18,11 +18,11 @@ export const getSpendingsById = async (req: Request, res: Response) => {
       "SELECT * FROM user_spendings WHERE id = $1",
       [req.params.id]
     );
-    const user = result.rows[0];
-    if (!user) {
+    const spent = result.rows[0];
+    if (!spent) {
       return res.status(404).json({ message: "User Spendings not found" });
     }
-    res.status(200).json(user);
+    res.status(200).json(spent);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -34,11 +34,11 @@ export const getSpendingsByUserId = async (req: Request, res: Response) => {
       "SELECT * FROM user_spendings WHERE user_id = $1",
       [req.params.user_id]
     );
-    const user = result.rows[0];
-    if (!user) {
+    const spent = result.rows[0];
+    if (!spent) {
       return res.status(404).json({ message: "User Spendings not found" });
     }
-    res.status(200).json(user);
+    res.status(200).json(spent);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -51,9 +51,9 @@ export const deleteSpendings = async (req: Request, res: Response) => {
       "DELETE FROM user_spendings WHERE id = $1 RETURNING *",
       [req.params.id]
     );
-    const user = result.rows[0];
+    const spent = result.rows[0];
 
-    if (!user) {
+    if (!spent) {
       return res.status(404).json({ message: "User Spendings not found" });
     }
     res.status(200).json({ message: "User Spendings deleted successfully" });
@@ -68,9 +68,9 @@ export const deleteSpendingsByUserId = async (req: Request, res: Response) => {
       "DELETE FROM user_spendings WHERE user_id = $1 RETURNING *",
       [req.params.user_id]
     );
-    const user = result.rows[0];
+    const spent = result.rows[0];
 
-    if (!user) {
+    if (!spent) {
       return res.status(404).json({ message: "User Spendings not found" });
     }
     res.status(200).json({ message: "User Spendings deleted successfully" });
@@ -95,7 +95,7 @@ export const createSpendings = async (req: Request, res: Response) => {
       "INSERT INTO user_spendings (start_date, end_date, spent_amount, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
       [start_date, end_date, req.body.spent_amount, req.body.user_id]
     );
-    const user = result.rows[0];
+    const spent = result.rows[0];
 
     //Recompute linear regression
     const user_spent = await pool.query(
@@ -133,7 +133,7 @@ export const createSpendings = async (req: Request, res: Response) => {
       [slope, intercept, req.body.user_id]
     );
 
-    res.status(201).json(user);
+    res.status(201).json(spent);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
