@@ -111,7 +111,7 @@ export const createSpendings = async (req: Request, res: Response) => {
 
     //Determine means
     for (let i = 0; i < user_spent["rows"].length; i++) {
-      accumulate_y += user_spent["rows"][i]["spent_amount"];
+      accumulate_y -= user_spent["rows"][i]["spent_amount"];
       mu_y += accumulate_y;
     }
     mu_y /= user_spent["rows"].length;
@@ -119,13 +119,21 @@ export const createSpendings = async (req: Request, res: Response) => {
     //OLS
     accumulate_y = 0;
     for (let i = 0; i < user_spent["rows"].length; i++) {
-      accumulate_y += user_spent["rows"][i]["spent_amount"];
+      accumulate_y -= user_spent["rows"][i]["spent_amount"];
       numerator += (i + 1 - mu_x) * (accumulate_y - mu_y);
       denominator += (i + 1 - mu_x) * (i + 1 - mu_x);
     }
 
+    //Get burnRateGoal
+    const brg = await pool.query(
+      'SELECT "burnRateGoal" FROM users WHERE id = $1',
+      [req.body.user_id]
+    );
+
+    //Shift LR up by burnRateGoal
+    let burnRateGoal = brg.rows[0]["burnRateGoal"];
     let slope = numerator / (denominator + Number.EPSILON);
-    let intercept = mu_y - slope * mu_x;
+    let intercept = mu_y - slope * mu_x + burnRateGoal;
 
     //Update User's slope and intercept
     const update_lr = await pool.query(
