@@ -1,14 +1,21 @@
 import express from "express";
 
-import { createSpendings } from "../controllers/spendings.controller";
+import {
+  getAllSpendings,
+  getSpendingsById,
+  getSpendingsByUserId,
+  deleteSpendings,
+  deleteSpendingsByUserId,
+  createSpendings,
+} from "../controllers/spendings.controller";
 
 const spendingsRouter = express.Router();
 
-// spendingsRouter.get("/", getAllExamples);
-// spendingsRouter.get("/:id", getExampleById);
+spendingsRouter.get("/", getAllSpendings);
+spendingsRouter.get("/:id", getSpendingsById);
+spendingsRouter.get("/user/:user_id", getSpendingsByUserId);
+spendingsRouter.delete("/:id", deleteSpendings);
+spendingsRouter.delete("/user/:user_id", deleteSpendingsByUserId);
 spendingsRouter.post("/", createSpendings);
-// spendingsRouter.put("/:id", updateExample);
-
-// spendingsRouter.delete("/:id", deleteExample);
 
 export default spendingsRouter;
