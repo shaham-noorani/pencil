@@ -81,6 +81,16 @@ export const deletePlaidItemByUserId = async (req: Request, res: Response) => {
 //Create Plaid Item
 export const createPlaidItem = async (req: Request, res: Response) => {
   try {
+    //Check if email already exists
+    const existingTokens = await pool.query(
+      "SELECT COUNT(*) FROM plaid_item WHERE token = $1",
+      [req.body.token]
+    );
+    const nExistingTokens = Number(existingTokens.rows[0].count);
+    if (nExistingTokens > 0) {
+      return res.status(409).json({ message: "Token already registered" });
+    }
+
     const result = await pool.query(
       "INSERT INTO plaid_item (token, user_id) VALUES ($1, $2) RETURNING *",
       [req.body.token, req.body.user_id]
