@@ -2,7 +2,7 @@ export default interface User {
   id: number;
   name: string;
   email: string;
-  burn_rate_goal: number;
+  budget_by_may: number;
   date_joined: Date;
   slope: number;
   intercept: number;
