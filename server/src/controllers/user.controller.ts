@@ -61,7 +61,7 @@ export const createUser = async (req: Request, res: Response) => {
     let dateTime = new Date();
 
     const result = await pool.query(
-      "INSERT INTO users (name, email, burnRateGoal, slope, intercept, date_joined) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      'INSERT INTO users (name, email, "burnRateGoal", slope, intercept, date_joined) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [req.body.name, req.body.email, req.body.burnRateGoal, 0, 0, dateTime]
     );
     const user = result.rows[0];
