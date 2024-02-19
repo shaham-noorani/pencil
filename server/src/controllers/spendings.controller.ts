@@ -106,7 +106,7 @@ export const createSpendings = async (req: Request, res: Response) => {
     let numerator = 0;
     let denominator = 0;
     let accumulate_y = 0;
-    let mu_x = (user_spent["rows"].length + 1) / 2;
+    let mu_x = user_spent["rows"].length / 2;
     let mu_y = 0;
 
     //Determine means
@@ -120,8 +120,8 @@ export const createSpendings = async (req: Request, res: Response) => {
     accumulate_y = 0;
     for (let i = 0; i < user_spent["rows"].length; i++) {
       accumulate_y -= user_spent["rows"][i]["spent_amount"];
-      numerator += (i + 1 - mu_x) * (accumulate_y - mu_y);
-      denominator += (i + 1 - mu_x) * (i + 1 - mu_x);
+      numerator += (i - mu_x) * (accumulate_y - mu_y);
+      denominator += (i - mu_x) * (i - mu_x);
     }
 
     //Get burnRateGoal
