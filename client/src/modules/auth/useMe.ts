@@ -15,6 +15,7 @@ const useMe = () => {
 
     try {
       setUser(res.data);
+      return res.data;
     } catch {
       console.error("Error getting user info (me)");
     }

@@ -58,14 +58,33 @@ export const createUser = async (req: Request, res: Response) => {
       return res.status(409).json({ message: "Email already exists" });
     }
 
+    let dateTime = new Date();
+
     const result = await pool.query(
-      "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *",
-      [req.body.name, req.body.email]
+      'INSERT INTO users (name, email, "burnRateGoal", slope, intercept, date_joined) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [req.body.name, req.body.email, req.body.burnRateGoal, 0, 0, dateTime]
     );
     const user = result.rows[0];
 
     res.status(201).json(user);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const updateUserBurnRateGoal = async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      'UPDATE users SET "burnRateGoal" = $1 WHERE email = $2 RETURNING *',
+      [req.body.burnRateGoal, req.params.email]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 };

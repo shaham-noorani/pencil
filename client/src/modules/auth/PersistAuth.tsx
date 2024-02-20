@@ -3,10 +3,10 @@ import useRefreshToken from "./useRefreshToken";
 import useAuth from "./useAuth";
 import useMe from "./useMe";
 import { Outlet } from "react-router";
-import { Spinner } from "@chakra-ui/react";
+import { Center, Spinner } from "@chakra-ui/react";
 
 const PersistAuth = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const refresh = useRefreshToken();
   const { auth }: any = useAuth();
   const me = useMe();
@@ -29,7 +29,11 @@ const PersistAuth = () => {
   }, []);
 
   if (isLoading) {
-    return <Spinner />;
+    return (
+      <Center width="100vw" height="100vh" bg="#222222">
+        <Spinner size="xl" color="white" />
+      </Center>
+    );
   }
 
   return <Outlet />;
