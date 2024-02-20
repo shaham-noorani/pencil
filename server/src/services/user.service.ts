@@ -11,7 +11,7 @@ export const createUser = async (user: User): Promise<User> => {
       user.slope,
       user.intercept,
       new Date(),
-    ]
+    ],
   );
 
   return req.rows[0];

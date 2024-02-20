@@ -34,7 +34,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM users WHERE id = $1 RETURNING *",
-      [req.params.id]
+      [req.params.id],
     );
     const user = result.rows[0];
 
@@ -66,7 +66,7 @@ export const updateUserBurnRateGoal = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "UPDATE users SET burn_rate_goal = $1 WHERE email = $2 RETURNING *",
-      [req.body.burn_rate_goal, req.params.email]
+      [req.body.burn_rate_goal, req.params.email],
     );
     const user = result.rows[0];
 

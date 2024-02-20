@@ -11,7 +11,7 @@ import { createUser, getUserByEmail } from "../services/user.service";
 export const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "postmessage"
+  "postmessage",
 );
 
 // Controller for handling Google login
@@ -20,7 +20,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
     const { tokens } = await client.getToken(req.body.code);
 
     const { email, name } = await getUserInformationFromToken(
-      tokens.id_token as string
+      tokens.id_token as string,
     );
 
     // check if user exists, if it does not, create a new user
