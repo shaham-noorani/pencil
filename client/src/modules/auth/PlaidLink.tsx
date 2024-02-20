@@ -1,40 +1,44 @@
 // APP COMPONENT
 // Upon rendering of App component, make a request to create and
 // obtain a link token to be used in the Link component
-import axios from "axios";
-import React from "react";
-import { usePlaidLink } from "react-plaid-link";
+import React, { useEffect, useState } from "react";
+import { usePlaidLink } from 'react-plaid-link';
 import { useNavigate } from "react-router-dom";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { Button } from "@chakra-ui/react";
 
 // LINK COMPONENT
 // Use Plaid Link and pass link token and onSuccess function
 // in configuration to initialize Plaid Link
-interface LinkProps {
-  linkToken: string | null;
-}
-const PlaidLink: React.FC<LinkProps> = (props: LinkProps) => {
+const PlaidLink = () => {
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
+
+  const [linkToken, setLinkToken] = useState(null);
+  const generateToken = async () => {
+    const response = await axiosPrivate.get("/plaid/create_link_token");
+    setLinkToken(response.data.link_token);
+  };
+  useEffect(() => {
+    generateToken();
+  }, []);
+
 
   const onSuccess = React.useCallback(async (temp_token: string) => {
     // send public_token to server
-    const url = import.meta.env.PROD ? "" : "http://localhost:3000";
-    const response = await axios.post(
-      url + "/api/plaid/exchange_public_token",
-      { public_token: temp_token }
-    );
-    console.log(response.data);
+    const response = await axiosPrivate.post('/plaid/exchange_public_token', {public_token: temp_token});
     navigate("/dashboard");
   }, []);
 
   const config: Parameters<typeof usePlaidLink>[0] = {
-    token: props.linkToken!,
+    token: linkToken,
     onSuccess,
   };
   const { open, ready } = usePlaidLink(config);
   return (
-    <button onClick={() => open()} disabled={!ready}>
+    <Button width="100%" onClick={() => open()} disabled={!ready}>
       Link account
-    </button>
+    </Button>
   );
 };
 export default PlaidLink;
