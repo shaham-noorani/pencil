@@ -16,7 +16,7 @@ export const getNetWorthById = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_net_worth WHERE id = $1",
-      [req.params.id]
+      [req.params.id],
     );
     const nw = result.rows[0];
     if (!nw) {
@@ -32,7 +32,7 @@ export const getNetWorthsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_net_worth WHERE user_id = $1",
-      [req.params.user_id]
+      [req.params.user_id],
     );
     const nw = result.rows[0];
     if (!nw) {
@@ -49,7 +49,7 @@ export const deleteNetWorth = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_net_worth WHERE id = $1 RETURNING *",
-      [req.params.id]
+      [req.params.id],
     );
     const nw = result.rows[0];
 
@@ -66,7 +66,7 @@ export const deleteNetWorthByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_net_worth WHERE user_id = $1 RETURNING *",
-      [req.params.user_id]
+      [req.params.user_id],
     );
     const nw = result.rows[0];
 
@@ -93,7 +93,7 @@ export const createNetWorth = async (req: Request, res: Response) => {
 
     const result = await pool.query(
       "INSERT INTO user_net_worth (start_date, end_date, amount, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-      [start_date, end_date, req.body.amount, req.body.user_id]
+      [start_date, end_date, req.body.amount, req.body.user_id],
     );
     const nw = result.rows[0];
 

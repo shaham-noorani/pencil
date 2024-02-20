@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
-import { TransactionsGetRequest, AccountBase, AccountType, Configuration, CountryCode, PlaidApi, PlaidEnvironments, Products } from "plaid";
-
+import {
+  TransactionsGetRequest,
+  AccountBase,
+  AccountType,
+  Configuration,
+  CountryCode,
+  PlaidApi,
+  PlaidEnvironments,
+  Products,
+} from "plaid";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -16,7 +24,7 @@ const PLAID_PRODUCTS = (
 // PLAID_COUNTRY_CODES is a comma-separated list of countries for which users
 // will be able to select institutions from.
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
-  ","
+  ",",
 );
 
 // Parameters used for the OAuth redirect Link flow.
@@ -34,7 +42,7 @@ const PLAID_ANDROID_PACKAGE_NAME = process.env.PLAID_ANDROID_PACKAGE_NAME || "";
 
 // We store the access_token in memory - in production, store it in a secure
 // persistent data store
-let ACCESS_TOKEN:string = "";
+let ACCESS_TOKEN: string = "";
 let PUBLIC_TOKEN = null;
 let ITEM_ID = null;
 let ACCOUNT_ID = null;
@@ -73,9 +81,9 @@ export const createLinkToken = async (req: Request, res: Response) => {
         // This should correspond to a unique id for the current user.
         client_user_id: clientUserId,
       },
-      client_name: 'Plaid Test App',
+      client_name: "Plaid Test App",
       products: [Products.Auth, Products.Transactions],
-      language: 'en',
+      language: "en",
       country_codes: [CountryCode.Us, CountryCode.Ca],
     };
 
@@ -111,12 +119,12 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
       access_token: ACCESS_TOKEN,
     });
     const accounts = response.data.accounts;
-    const accountsOverview : {[key: string]: AccountBase[]} = {};
+    const accountsOverview: { [key: string]: AccountBase[] } = {};
     for (let i = 0; i < accounts.length; i++) {
       const account = accounts[i];
-      const type : string = account.type;
+      const type: string = account.type;
       if (!(type in accountsOverview)) {
-        accountsOverview[type] = []
+        accountsOverview[type] = [];
       }
       accountsOverview[type].push(account);
     }
@@ -127,22 +135,24 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
   }
 };
 
-export const getAccountBalancesOverTime = async (req: Request, res: Response) => {
+export const getAccountBalancesOverTime = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     let yourDate = new Date();
-    const startDate = '2023-08-01';
-    const currentDate = yourDate.toISOString().split('T')[0]
+    const startDate = "2023-08-01";
+    const currentDate = yourDate.toISOString().split("T")[0];
 
     const request: TransactionsGetRequest = {
       access_token: "access-sandbox-9d4831b0-1736-46d9-902b-0e93dfebeced",
       start_date: startDate,
-      end_date: currentDate
+      end_date: currentDate,
     };
 
     const response = await client.transactionsGet(request);
     let transactions = response.data.transactions;
     const total_transactions = response.data.total_transactions;
-    
 
     while (transactions.length < total_transactions) {
       const paginatedRequest: TransactionsGetRequest = {
@@ -150,13 +160,11 @@ export const getAccountBalancesOverTime = async (req: Request, res: Response) =>
         start_date: startDate,
         end_date: currentDate,
         options: {
-          offset: transactions.length
+          offset: transactions.length,
         },
       };
       const paginatedResponse = await client.transactionsGet(paginatedRequest);
-      transactions = transactions.concat(
-        paginatedResponse.data.transactions,
-      );
+      transactions = transactions.concat(paginatedResponse.data.transactions);
     }
     res.status(200).json(transactions);
   } catch (error: any) {

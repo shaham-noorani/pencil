@@ -33,7 +33,7 @@ export const createExample = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "INSERT INTO examples (name) VALUES ($1) RETURNING *",
-      [req.body.name]
+      [req.body.name],
     );
     const example = result.rows[0];
 
@@ -48,7 +48,7 @@ export const updateExample = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "UPDATE examples SET name = $1 WHERE id = $2 RETURNING *",
-      [req.body.name, req.params.id]
+      [req.body.name, req.params.id],
     );
     const example = result.rows[0];
 
@@ -66,7 +66,7 @@ export const deleteExample = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM examples WHERE id = $1 RETURNING *",
-      [req.params.id]
+      [req.params.id],
     );
     const example = result.rows[0];
 

@@ -1,18 +1,48 @@
-import { Box, VStack } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Center, Spinner, VStack } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import HeaderNetWorth from "../modules/dashboard/HeaderNetWorth";
-import HeaderBurnRate from "../modules/dashboard/HeaderBurnRate";
-import BurnRateChange from "../modules/dashboard/BurnRateChange";
-import BurnRateValue from "../modules/dashboard/BurnRateValue";
 import NetWorthChange from "../modules/dashboard/NetWorthChange";
 import NetWorthValue from "../modules/dashboard/NetWorthValue";
 import CashTabComponent from "../modules/dashboard/CashTabComponent";
-import LinechartBurnRate from "../modules/dashboard/LinechartBurnRate";
 import LinechartNetWorth from "../modules/dashboard/LinechartNetWorth";
+import useUser from "../hooks/useUser";
+import { useNavigate } from "react-router-dom";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useMe from "../modules/auth/useMe";
 
 const DashboardPage = () => {
+  const { user }: any = useUser();
+  const me = useMe();
+  const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
+  const [loading, setLoading] = useState(true);
+
   const [stage, setStage] = useState(0);
 
+  console.log("ABOUT TO PRINT USER STUFF");
+  console.log(user);
+  console.log("JUST PRINTED USER STUFF");
+
+  useEffect(() => {
+    me().then((user) => {
+      axiosPrivate
+        .get(`/plaid/user/${user.id}`)
+        .catch(() => {
+          navigate("/connect-account");
+        })
+        .then(() => {
+          setLoading(false);
+        });
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <Center width="100vw" height="100vh" bg="#222222">
+        <Spinner size="xl" color="white" />
+      </Center>
+    );
+  }
   // Hardcoded values for now
   // const projectedSavings = 5000;
   // const targetSavings = 4000;
@@ -34,7 +64,7 @@ const DashboardPage = () => {
   ];
   const totalCashToday = cashAccounts.reduce(
     (sum, account) => sum + account.value,
-    0
+    0,
   );
 
   return (

@@ -34,7 +34,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM users WHERE id = $1 RETURNING *",
-      [req.params.id]
+      [req.params.id],
     );
     const user = result.rows[0];
 
