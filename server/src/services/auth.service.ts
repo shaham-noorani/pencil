@@ -23,7 +23,7 @@ export const refreshCredentials = async (refreshToken: string) => {
   const user = new UserRefreshClient(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    refreshToken
+    refreshToken,
   );
 
   return await user.refreshAccessToken();
@@ -32,7 +32,7 @@ export const refreshCredentials = async (refreshToken: string) => {
 export const authMiddleware = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
 
