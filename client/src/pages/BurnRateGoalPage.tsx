@@ -10,11 +10,11 @@ function BurnRateGoal() {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
 
-  const [burnRateGoal, setBurnRateGoal] = useState<number>(0);
+  const [burn_rate_goal, setBurnRateGoal] = useState<number>(0);
   const [showSubmit, setShowSubmit] = useState<boolean>(false);
 
   useEffect(() => {
-    if (user.burnRateGoal !== null) {
+    if (user.burn_rate_goal !== null) {
       navigate("/burn");
     }
   }, [user]);
@@ -22,7 +22,7 @@ function BurnRateGoal() {
   const updateUser = async () => {
     try {
       await axiosPrivate.put("/user/update-burn-rate-goal/" + user.email, {
-        burnRateGoal: burnRateGoal,
+        burn_rate_goal: burn_rate_goal,
       });
 
       setShowSubmit(true);
@@ -55,7 +55,7 @@ function BurnRateGoal() {
           <NumberInput
             color={"white"}
             mb={4}
-            value={burnRateGoal as number}
+            value={burn_rate_goal as number}
             onChange={(value) => {
               setBurnRateGoal(value ? parseInt(value) : 0);
             }}
@@ -68,7 +68,7 @@ function BurnRateGoal() {
             w={"100%"}
             onClick={() => updateUser()}
             mt={"60vh"}
-            isDisabled={burnRateGoal === 0}
+            isDisabled={burn_rate_goal === 0}
           >
             Submit
           </Button>

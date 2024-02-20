@@ -3,7 +3,7 @@
 // obtain a link token to be used in the Link component
 import axios from "axios";
 import React from "react";
-import { usePlaidLink } from 'react-plaid-link';
+import { usePlaidLink } from "react-plaid-link";
 import { useNavigate } from "react-router-dom";
 
 // LINK COMPONENT
@@ -18,11 +18,14 @@ const PlaidLink: React.FC<LinkProps> = (props: LinkProps) => {
   const onSuccess = React.useCallback(async (temp_token: string) => {
     // send public_token to server
     const url = import.meta.env.PROD ? "" : "http://localhost:3000";
-    const response = await axios.post(url + '/api/plaid/exchange_public_token', {public_token: temp_token});
+    const response = await axios.post(
+      url + "/api/plaid/exchange_public_token",
+      { public_token: temp_token }
+    );
     console.log(response.data);
     navigate("/dashboard");
   }, []);
-  
+
   const config: Parameters<typeof usePlaidLink>[0] = {
     token: props.linkToken!,
     onSuccess,

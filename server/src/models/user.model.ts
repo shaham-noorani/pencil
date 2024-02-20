@@ -1,8 +1,8 @@
 export default interface User {
-  id: number;
+  id?: number;
   name: string;
   email: string;
-  burnRateGoal: number;
+  burn_rate_goal: number | null;
   date_joined: Date;
   slope: number;
   intercept: number;
