@@ -4,7 +4,7 @@ import {
   getAllUsers,
   getUserById,
   deleteUser,
-  createUser,
+  createUserController,
   updateUserBurnRateGoal,
 } from "../controllers/user.controller";
 
@@ -12,7 +12,7 @@ const userRouter = express.Router();
 
 userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
-userRouter.post("/", createUser);
+userRouter.post("/", createUserController);
 userRouter.delete("/:id", deleteUser);
 userRouter.put("/update-burn-rate-goal/:email", updateUserBurnRateGoal);
 

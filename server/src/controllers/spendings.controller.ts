@@ -124,16 +124,16 @@ export const createSpendings = async (req: Request, res: Response) => {
       denominator += (i - mu_x) * (i - mu_x);
     }
 
-    //Get burnRateGoal
+    //Get burn_rate_goal
     const brg = await pool.query(
-      'SELECT "burnRateGoal" FROM users WHERE id = $1',
+      "SELECT burn_rate_goal FROM users WHERE id = $1",
       [req.body.user_id]
     );
 
-    //Shift LR up by burnRateGoal
-    let burnRateGoal = brg.rows[0]["burnRateGoal"];
+    //Shift LR up by burn_rate_goal
+    let burn_rate_goal = brg.rows[0]["burn_rate_goal"];
     let slope = numerator / (denominator + Number.EPSILON);
-    let intercept = mu_y - slope * mu_x + burnRateGoal;
+    let intercept = mu_y - slope * mu_x + burn_rate_goal;
 
     //Update User's slope and intercept
     const update_lr = await pool.query(

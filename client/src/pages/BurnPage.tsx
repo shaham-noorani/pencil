@@ -11,7 +11,7 @@ const BurnPage: React.FC = () => {
 
   useEffect(() => {
     me().then((user) => {
-      if (user.burnRateGoal === null) {
+      if (user.burn_rate_goal === null) {
         navigate("/burn-rate-goal");
       } else {
         setLoading(false);
