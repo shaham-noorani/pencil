@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import PersistAuth from "./modules/auth/PersistAuth";
@@ -12,20 +10,22 @@ import BurnRateGoal from "./pages/BurnRateGoalPage";
 import ConnectAccountPage from "./pages/ConnectAccountPage";
 
 function App() {
-  
   return (
     <>
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/plaid" element={<PlaidLink/>} />
+          <Route path="/plaid" element={<PlaidLink />} />
           <Route element={<PersistAuth />}>
             <Route element={<RequireAuth />}>
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/burn" element={<BurnPage />} />
                 <Route path="/burn-rate-goal" element={<BurnRateGoal />} />
-                <Route path="/connect-account" element={<ConnectAccountPage />} />
+                <Route
+                  path="/connect-account"
+                  element={<ConnectAccountPage />}
+                />
                 <Route path="*" element={<DashboardPage />} />
               </Route>
             </Route>
