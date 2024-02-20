@@ -1,7 +1,8 @@
 import express from "express";
 
 import {
-    createLinkToken, exchangePublicToken
+  createLinkToken,
+  exchangePublicToken,
 } from "../controllers/plaid.controller";
 
 const plaidRouter = express.Router();
