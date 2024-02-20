@@ -79,7 +79,6 @@ export const createLinkToken = async (req: Request, res: Response) => {
       country_codes: [CountryCode.Us, CountryCode.Ca],
     };
 
-    console.log(request);
     const createTokenResponse = await client.linkTokenCreate(request);
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
