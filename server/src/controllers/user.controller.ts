@@ -65,8 +65,8 @@ export const createUserController = async (req: Request, res: Response) => {
 export const updateUserBurnRateGoal = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
-      "UPDATE users SET burn_rate_goal = $1 WHERE email = $2 RETURNING *",
-      [req.body.burn_rate_goal, req.params.email]
+      "UPDATE users SET burn_rate_goal = $1 WHERE id = $2 RETURNING *",
+      [req.body.burn_rate_goal, req.params.id]
     );
     const user = result.rows[0];
 
