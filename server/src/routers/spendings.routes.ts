@@ -6,7 +6,7 @@ import {
   getSpendingsByUserId,
   deleteSpendings,
   deleteSpendingsByUserId,
-  createSpendings,
+  createSpendingsController,
 } from "../controllers/spendings.controller";
 
 const spendingsRouter = express.Router();
@@ -16,6 +16,6 @@ spendingsRouter.get("/:id", getSpendingsById);
 spendingsRouter.get("/user/:user_id", getSpendingsByUserId);
 spendingsRouter.delete("/:id", deleteSpendings);
 spendingsRouter.delete("/user/:user_id", deleteSpendingsByUserId);
-spendingsRouter.post("/", createSpendings);
+spendingsRouter.post("/", createSpendingsController);
 
 export default spendingsRouter;
