@@ -15,7 +15,7 @@ function App() {
   const generateToken = async () => {
     const url = import.meta.env.PROD ? "" : "http://localhost:3000";
     const response = await axios.get(url + "/api/plaid/create_link_token");
-    console.log(response.data);
+
     setLinkToken(response.data.link_token);
   };
   useEffect(() => {

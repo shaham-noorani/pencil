@@ -67,16 +67,10 @@ export const googleRefreshToken = async (req: Request, res: Response) => {
 export const getMe = async (req: Request, res: Response) => {
   const idToken = req.headers.authorization?.split(" ")[1]; // Bearer <token>
 
-  console.log("token", idToken);
-
   const userInfo = await getUserInformationFromToken(idToken as string);
-
-  console.log("user info", userInfo);
 
   try {
     const user = await getUserByEmail(userInfo.email);
-
-    console.log("user", user);
 
     res.json(user);
   } catch (err) {
