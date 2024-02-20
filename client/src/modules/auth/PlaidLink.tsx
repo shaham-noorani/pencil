@@ -2,7 +2,7 @@
 // Upon rendering of App component, make a request to create and
 // obtain a link token to be used in the Link component
 import React, { useEffect, useState } from "react";
-import { usePlaidLink } from 'react-plaid-link';
+import { usePlaidLink } from "react-plaid-link";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Button } from "@chakra-ui/react";
@@ -23,10 +23,11 @@ const PlaidLink = () => {
     generateToken();
   }, []);
 
-
   const onSuccess = React.useCallback(async (temp_token: string) => {
     // send public_token to server
-    const response = await axiosPrivate.post('/plaid/exchange_public_token', {public_token: temp_token});
+    const response = await axiosPrivate.post("/plaid/exchange_public_token", {
+      public_token: temp_token,
+    });
     navigate("/dashboard");
   }, []);
 

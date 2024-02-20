@@ -1,17 +1,17 @@
-import { Box, Text, Flex } from '@chakra-ui/react';
-import PlaidLink from '../modules/auth/PlaidLink';
-import useUser from '../hooks/useUser';
+import { Box, Text, Flex } from "@chakra-ui/react";
+import PlaidLink from "../modules/auth/PlaidLink";
+import useUser from "../hooks/useUser";
 
-const ConnectAccountPage = () => { 
+const ConnectAccountPage = () => {
   const { user }: any = useUser();
-  const userFirstName = user.name.split(' ')[0];
+  const userFirstName = user.name.split(" ")[0];
 
   return (
     <Flex
       direction="column"
       align="center"
       justify="flex-start"
-      h="100%" 
+      h="100%"
       bg="#222222"
       color="white"
       p={4}
@@ -22,7 +22,7 @@ const ConnectAccountPage = () => {
         </Text>
       </Box>
       <Flex width="100%" px="10%" mt="65vh">
-        {<PlaidLink/>}
+        {<PlaidLink />}
       </Flex>
     </Flex>
   );

@@ -25,12 +25,15 @@ const DashboardPage = () => {
 
   useEffect(() => {
     me().then((user) => {
-      axiosPrivate.get(`/plaid/user/${user.id}`).catch(() => {
-        navigate("/connect-account");
-      }).then(() => {
-        setLoading(false);
-      });
-    })
+      axiosPrivate
+        .get(`/plaid/user/${user.id}`)
+        .catch(() => {
+          navigate("/connect-account");
+        })
+        .then(() => {
+          setLoading(false);
+        });
+    });
   }, []);
 
   if (loading) {
@@ -61,7 +64,7 @@ const DashboardPage = () => {
   ];
   const totalCashToday = cashAccounts.reduce(
     (sum, account) => sum + account.value,
-    0
+    0,
   );
 
   return (
