@@ -84,12 +84,16 @@ export const deleteSpendingsByUserId = async (req: Request, res: Response) => {
 };
 
 //Create Spendings
-export const createSpendingsController = async (req: Request, res: Response) => {
+export const createSpendingsController = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const spending = await createSpendings(req.body);
     const lr = await buildLinearRegression(req.body.user_id);
-    
+
     res.status(201).json(spending);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
+  }
 };
