@@ -10,6 +10,42 @@ import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
 
+interface Account {
+  account_id: string;
+  balances: {
+    available: number;
+    current: number;
+    iso_currency_code: string;
+    limit: null | number;
+    unofficial_currency_code: null | string;
+  };
+  mask: string;
+  name: string;
+  official_name: string;
+  persistent_account_id: string;
+  subtype: string;
+  type: string;
+}
+
+interface AccountsOverview {
+  depository: Account[];
+  investment: Account[];
+  creditCard: Account[];
+  loans: Account[];
+}
+
+interface AccountsOverviewResponse {
+  bankName: string;
+  accountsOverview: AccountsOverview;
+}
+
+interface CashAccount {
+  bankName: string;
+  last4CCNumber: string;
+  bankNickname: string;
+  value: number;
+}
+
 const DashboardPage = () => {
   const { user }: any = useUser();
   const me = useMe();
@@ -18,10 +54,8 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [stage, setStage] = useState(0);
+  const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
 
-  console.log("ABOUT TO PRINT USER STUFF");
-  console.log(user);
-  console.log("JUST PRINTED USER STUFF");
 
   useEffect(() => {
     me().then((user) => {
@@ -36,6 +70,33 @@ const DashboardPage = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const fetchAccountsOverview = async () => {
+      try {
+        const { data } = await axiosPrivate.get('/plaid/get_accounts_overview');
+        processAccountsOverview(data);
+      } catch (error) {
+        console.error('Failed to fetch accounts overview:', error);
+      }
+    };
+  
+    fetchAccountsOverview();
+  }, []);
+
+  const processAccountsOverview = (data: AccountsOverviewResponse) => {
+    const cashAccountsList = data.accountsOverview.depository?.map(account => ({
+      bankName: data.bankName,
+      last4CCNumber: account.mask,
+      bankNickname: account.name,
+      value: account.balances.available,
+    })) || [];
+
+    setCashAccounts(cashAccountsList);
+    console.log("\n\ncashAccountsList\n\n");
+    console.log(cashAccountsList);
+    console.log("\n\ncashAccountsList\n\n");
+  }
+
   if (loading) {
     return (
       <Center width="100vw" height="100vh" bg="#222222">
@@ -43,29 +104,21 @@ const DashboardPage = () => {
       </Center>
     );
   }
-  // Hardcoded values for now
-  // const projectedSavings = 5000;
-  // const targetSavings = 4000;
-  const netWorthToday = 10000;
-  const netWorthYesterday = 9000;
-  const cashAccounts = [
-    {
-      bankName: "Bank of America",
-      last4CCNumber: "8008",
-      bankNickname: "ADV SafeBalance Banking",
-      value: 10200.87,
-    },
-    {
-      bankName: "Chase Bank",
-      last4CCNumber: "6969",
-      bankNickname: "High School Checking",
-      value: 3141.59,
-    },
-  ];
-  const totalCashToday = cashAccounts.reduce(
-    (sum, account) => sum + account.value,
-    0,
-  );
+
+  // TODO
+  // now that we have users cash accounts retrieved from API call, and we are ready to display in CashTabComponent, 
+  //   how do we store the user + plaiditem in the plaid_item table?
+
+  const totalCashBalance = 0;
+  const totalInvestmentsBalance = 0;
+  const totalCreditCardsBalance = 0;
+  const totalLoansBalance = 0;
+  const netWorthToday = (totalCashBalance + totalInvestmentsBalance) - (totalCreditCardsBalance + totalLoansBalance); 
+  const netWorthYesterday = 9000; // how to calculate this?
+  const goalSavingsAmount = 0;
+  const monthlyBudget = 0;
+  const remainingBudgetThisMonth = 0;
+  const projectedSavingsAmount = 0;
 
   return (
     <VStack
@@ -101,22 +154,22 @@ const DashboardPage = () => {
         <CashTabComponent
           accounts={cashAccounts}
           label="Cash"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Investments"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Credit Cards"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Loans"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
       </Box>
     </VStack>

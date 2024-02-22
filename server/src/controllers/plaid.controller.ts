@@ -113,11 +113,33 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
   }
 };
 
+async function fetchBankNameFromInstitutionId(institutionId: string): Promise<string> {
+  try {
+    const response = await client.institutionsGetById({
+      institution_id: institutionId,
+      country_codes: [CountryCode.Us],
+    });
+
+    const bankName = response.data.institution.name;
+    return bankName;
+  } catch (error) {
+    console.error('Error fetching bank name for institutionId:', institutionId, error);
+    return 'Unknown Bank';
+  }
+}
+
 export const getAccountsOverview = async (req: Request, res: Response) => {
   try {
     const response = await client.accountsGet({
       access_token: ACCESS_TOKEN,
     });
+
+    console.log("\n\nRESPONSE DATA\n\n");
+    console.log(response.data);
+    console.log("\n\nRESPONSE DATA\n\n");
+
+    const institutionId = response.data.item.institution_id ? response.data.item.institution_id : "";
+    const bankName = await fetchBankNameFromInstitutionId(institutionId);
     const accounts = response.data.accounts;
     const accountsOverview: { [key: string]: AccountBase[] } = {};
     for (let i = 0; i < accounts.length; i++) {
@@ -129,7 +151,15 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
       accountsOverview[type].push(account);
     }
 
-    res.status(200).json(accountsOverview);
+    const overviewResponse = {
+      bankName,
+      accountsOverview
+    };
+
+    console.log("\n\nRESPONSE\n\n");
+    console.log(overviewResponse);
+    console.log("\n\nRESPONSE\n\n");
+    res.status(200).json(overviewResponse);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
