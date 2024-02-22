@@ -135,19 +135,28 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
   }
 };
 
-export const getAccountBalancesOverTime = async (
-  req: Request,
-  res: Response,
-) => {
+
+function getCorrespondingSunday(date: Date): string {
+  const dayOfWeek = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+  const diff = date.getDate() - dayOfWeek; // Subtract the current day of the week to get Sunday
+
+  // Create a new Date object with the corresponding Sunday
+  const sunday = new Date(date);
+  sunday.setDate(diff);
+
+  return sunday.toDateString();
+}
+
+export const getTransactionsSinceAugust = async (req: Request, res: Response) => {
   try {
-    let yourDate = new Date();
-    const startDate = "2023-08-01";
-    const currentDate = yourDate.toISOString().split("T")[0];
+    let currentDate = new Date();
+    const startDateString = '2023-08-01';
+    const currentDateString = currentDate.toISOString().split('T')[0]
 
     const request: TransactionsGetRequest = {
       access_token: "access-sandbox-9d4831b0-1736-46d9-902b-0e93dfebeced",
-      start_date: startDate,
-      end_date: currentDate,
+      start_date: startDateString,
+      end_date: currentDateString
     };
 
     const response = await client.transactionsGet(request);
@@ -157,16 +166,32 @@ export const getAccountBalancesOverTime = async (
     while (transactions.length < total_transactions) {
       const paginatedRequest: TransactionsGetRequest = {
         access_token: "access-sandbox-9d4831b0-1736-46d9-902b-0e93dfebeced",
-        start_date: startDate,
-        end_date: currentDate,
+        start_date: startDateString,
+        end_date: currentDateString,
         options: {
           offset: transactions.length,
         },
       };
       const paginatedResponse = await client.transactionsGet(paginatedRequest);
-      transactions = transactions.concat(paginatedResponse.data.transactions);
-    }
-    res.status(200).json(transactions);
+      transactions = transactions.concat(
+        paginatedResponse.data.transactions,
+      );
+    };
+
+    const groupedTransactions: Record<string, number> = {};
+
+    transactions.forEach(transaction => {
+        const date = new Date(transaction.date);
+        const sunday = getCorrespondingSunday(date);
+
+        if (!groupedTransactions[sunday]) {
+            groupedTransactions[sunday] = 0;
+        }
+
+        groupedTransactions[sunday] += transaction.amount;
+    });
+
+    res.status(200).json(groupedTransactions);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
