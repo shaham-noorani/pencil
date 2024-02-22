@@ -16,7 +16,7 @@ export const getSpendingsById = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE id = $1",
-      [req.params.id]
+      [req.params.id],
     );
     const spent = result.rows[0];
     if (!spent) {
@@ -32,7 +32,7 @@ export const getSpendingsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE user_id = $1",
-      [req.params.user_id]
+      [req.params.user_id],
     );
     const spent = result.rows[0];
     if (!spent) {
@@ -49,7 +49,7 @@ export const deleteSpendings = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_spendings WHERE id = $1 RETURNING *",
-      [req.params.id]
+      [req.params.id],
     );
     const spent = result.rows[0];
 
@@ -66,7 +66,7 @@ export const deleteSpendingsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_spendings WHERE user_id = $1 RETURNING *",
-      [req.params.user_id]
+      [req.params.user_id],
     );
     const spent = result.rows[0];
 
@@ -93,14 +93,14 @@ export const createSpendings = async (req: Request, res: Response) => {
 
     const result = await pool.query(
       "INSERT INTO user_spendings (start_date, end_date, spent_amount, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
-      [start_date, end_date, req.body.spent_amount, req.body.user_id]
+      [start_date, end_date, req.body.spent_amount, req.body.user_id],
     );
     const spent = result.rows[0];
 
     //Recompute linear regression
     const user_spent = await pool.query(
       "SELECT spent_amount FROM user_spendings WHERE user_id = $1",
-      [req.body.user_id]
+      [req.body.user_id],
     );
 
     let numerator = 0;
@@ -124,21 +124,21 @@ export const createSpendings = async (req: Request, res: Response) => {
       denominator += (i - mu_x) * (i - mu_x);
     }
 
-    //Get burnRateGoal
+    //Get burn_rate_goal
     const brg = await pool.query(
-      'SELECT "burnRateGoal" FROM users WHERE id = $1',
-      [req.body.user_id]
+      "SELECT burn_rate_goal FROM users WHERE id = $1",
+      [req.body.user_id],
     );
 
-    //Shift LR up by burnRateGoal
-    let burnRateGoal = brg.rows[0]["burnRateGoal"];
+    //Shift LR up by burn_rate_goal
+    let burn_rate_goal = brg.rows[0]["burn_rate_goal"];
     let slope = numerator / (denominator + Number.EPSILON);
-    let intercept = mu_y - slope * mu_x + burnRateGoal;
+    let intercept = mu_y - slope * mu_x + burn_rate_goal;
 
     //Update User's slope and intercept
     const update_lr = await pool.query(
       "UPDATE users SET slope = $1, intercept = $2 WHERE id = $3 RETURNING *",
-      [slope, intercept, req.body.user_id]
+      [slope, intercept, req.body.user_id],
     );
 
     res.status(201).json(spent);

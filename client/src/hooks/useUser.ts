@@ -7,7 +7,9 @@ const useUser = () => {
       id: string;
       email: string;
       name: string;
-      burnRateGoal: number | null;
+      burn_rate_goal: number | null;
+      slope: number;
+      intercept: number;
     };
     setUser: (user: any) => void;
   };

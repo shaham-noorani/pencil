@@ -5,12 +5,13 @@ import {
   refreshCredentials,
 } from "../services/auth.service";
 import { pool } from "../db";
+import { createUser, getUserByEmail } from "../services/user.service";
 
 // Initialize the Google OAuth2 client
 export const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  "postmessage"
+  "postmessage",
 );
 
 // Controller for handling Google login
@@ -19,8 +20,22 @@ export const googleSignIn = async (req: Request, res: Response) => {
     const { tokens } = await client.getToken(req.body.code);
 
     const { email, name } = await getUserInformationFromToken(
-      tokens.id_token as string
+      tokens.id_token as string,
     );
+
+    // check if user exists, if it does not, create a new user
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+      await createUser({
+        email: email,
+        name: name,
+        burn_rate_goal: null,
+        slope: 0,
+        intercept: 0,
+        date_joined: new Date(),
+      });
+    }
 
     res.json({ email, name, tokens });
   } catch (error) {
@@ -34,6 +49,9 @@ export const googleRefreshToken = async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken;
 
   try {
+    if (!refreshToken)
+      res.status(400).json({ error: "No refresh token provided" });
+
     const { credentials } = await refreshCredentials(refreshToken);
 
     res.json({
@@ -52,16 +70,7 @@ export const getMe = async (req: Request, res: Response) => {
   const userInfo = await getUserInformationFromToken(idToken as string);
 
   try {
-    const burnRateGoal = (
-      await pool.query("SELECT * FROM users WHERE email = $1", [userInfo.email])
-    ).rows[0].burnRateGoal;
-
-    const user = {
-      email: userInfo.email,
-      name: userInfo.name,
-      profile: userInfo.profile,
-      burnRateGoal: burnRateGoal,
-    };
+    const user = await getUserByEmail(userInfo.email);
 
     res.json(user);
   } catch (err) {

@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
-import { TransactionsGetRequest, AccountBase, AccountType, Configuration, CountryCode, PlaidApi, PlaidEnvironments, Products } from "plaid";
-
+import {
+  TransactionsGetRequest,
+  AccountBase,
+  AccountType,
+  Configuration,
+  CountryCode,
+  PlaidApi,
+  PlaidEnvironments,
+  Products,
+} from "plaid";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -16,7 +24,7 @@ const PLAID_PRODUCTS = (
 // PLAID_COUNTRY_CODES is a comma-separated list of countries for which users
 // will be able to select institutions from.
 const PLAID_COUNTRY_CODES = (process.env.PLAID_COUNTRY_CODES || "US").split(
-  ","
+  ",",
 );
 
 // Parameters used for the OAuth redirect Link flow.
@@ -34,7 +42,7 @@ const PLAID_ANDROID_PACKAGE_NAME = process.env.PLAID_ANDROID_PACKAGE_NAME || "";
 
 // We store the access_token in memory - in production, store it in a secure
 // persistent data store
-let ACCESS_TOKEN:string = "";
+let ACCESS_TOKEN: string = "";
 let PUBLIC_TOKEN = null;
 let ITEM_ID = null;
 let ACCOUNT_ID = null;
@@ -73,13 +81,12 @@ export const createLinkToken = async (req: Request, res: Response) => {
         // This should correspond to a unique id for the current user.
         client_user_id: clientUserId,
       },
-      client_name: 'Plaid Test App',
+      client_name: "Plaid Test App",
       products: [Products.Auth, Products.Transactions],
-      language: 'en',
+      language: "en",
       country_codes: [CountryCode.Us, CountryCode.Ca],
     };
 
-    console.log(request);
     const createTokenResponse = await client.linkTokenCreate(request);
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
@@ -112,12 +119,12 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
       access_token: ACCESS_TOKEN,
     });
     const accounts = response.data.accounts;
-    const accountsOverview : {[key: string]: AccountBase[]} = {};
+    const accountsOverview: { [key: string]: AccountBase[] } = {};
     for (let i = 0; i < accounts.length; i++) {
       const account = accounts[i];
-      const type : string = account.type;
+      const type: string = account.type;
       if (!(type in accountsOverview)) {
-        accountsOverview[type] = []
+        accountsOverview[type] = [];
       }
       accountsOverview[type].push(account);
     }
@@ -127,6 +134,7 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 function getCorrespondingSunday(date: Date): string {
   const dayOfWeek = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
@@ -154,7 +162,6 @@ export const getTransactionsSinceAugust = async (req: Request, res: Response) =>
     const response = await client.transactionsGet(request);
     let transactions = response.data.transactions;
     const total_transactions = response.data.total_transactions;
-    
 
     while (transactions.length < total_transactions) {
       const paginatedRequest: TransactionsGetRequest = {
@@ -162,7 +169,7 @@ export const getTransactionsSinceAugust = async (req: Request, res: Response) =>
         start_date: startDateString,
         end_date: currentDateString,
         options: {
-          offset: transactions.length
+          offset: transactions.length,
         },
       };
       const paginatedResponse = await client.transactionsGet(paginatedRequest);
