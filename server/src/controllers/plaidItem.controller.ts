@@ -31,7 +31,7 @@ export const getPlaidItemsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM plaid_item WHERE user_id = $1",
-      [req.params.user_id],
+      [req.params.user_id]
     );
     const item = result.rows[0];
     if (!item) {
@@ -48,7 +48,7 @@ export const deletePlaidItem = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM plaid_item WHERE id = $1 RETURNING *",
-      [req.params.id],
+      [req.params.id]
     );
     const item = result.rows[0];
 
@@ -65,7 +65,7 @@ export const deletePlaidItemByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM plaid_item WHERE user_id = $1 RETURNING *",
-      [req.params.user_id],
+      [req.params.user_id]
     );
     const item = result.rows[0];
 
@@ -81,19 +81,9 @@ export const deletePlaidItemByUserId = async (req: Request, res: Response) => {
 //Create Plaid Item
 export const createPlaidItem = async (req: Request, res: Response) => {
   try {
-    //Check if token already exists
-    const existingTokens = await pool.query(
-      "SELECT COUNT(*) FROM plaid_item WHERE token = $1",
-      [req.body.token],
-    );
-    const nExistingTokens = Number(existingTokens.rows[0].count);
-    if (nExistingTokens > 0) {
-      return res.status(409).json({ message: "Token already registered" });
-    }
-
     const result = await pool.query(
       "INSERT INTO plaid_item (token, user_id) VALUES ($1, $2) RETURNING *",
-      [req.body.token, req.body.user_id],
+      [req.body.token, req.body.user_id]
     );
     const item = result.rows[0];
 

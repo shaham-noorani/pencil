@@ -21,7 +21,7 @@ function BurnRateGoal() {
 
   const updateUser = async () => {
     try {
-      await axiosPrivate.put("/user/update-burn-rate-goal/" + user.email, {
+      await axiosPrivate.put("/user/update-burn-rate-goal/" + user.id, {
         burn_rate_goal: burn_rate_goal,
       });
 

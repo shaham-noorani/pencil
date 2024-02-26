@@ -14,6 +14,6 @@ userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
 userRouter.post("/", createUserController);
 userRouter.delete("/:id", deleteUser);
-userRouter.put("/update-burn-rate-goal/:email", updateUserBurnRateGoal);
+userRouter.put("/update-burn-rate-goal/:id", updateUserBurnRateGoal);
 
 export default userRouter;
