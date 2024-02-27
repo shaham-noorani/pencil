@@ -4,6 +4,7 @@ import {
   getAllSpendings,
   getSpendingsById,
   getSpendingsByUserId,
+  getSpendingsByUserIdAndDateRange,
   deleteSpendings,
   deleteSpendingsByUserId,
   createSpendingsController,
@@ -14,6 +15,7 @@ const spendingsRouter = express.Router();
 spendingsRouter.get("/", getAllSpendings);
 spendingsRouter.get("/:id", getSpendingsById);
 spendingsRouter.get("/user/:user_id", getSpendingsByUserId);
+spendingsRouter.get("/user/range/:user_id", getSpendingsByUserIdAndDateRange)
 spendingsRouter.delete("/:id", deleteSpendings);
 spendingsRouter.delete("/user/:user_id", deleteSpendingsByUserId);
 spendingsRouter.post("/", createSpendingsController);
