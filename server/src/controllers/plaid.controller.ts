@@ -107,10 +107,10 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
     // currently storing them locally
     ACCESS_TOKEN = response.data.access_token;
     ITEM_ID = response.data.item_id;
-    console.log("req.params are\n", req.params, "\n");
+    // TODO: use userID from req params
+    // console.log("req.params are\n", req.params, "\n");
     // const userId: number = Number(req.params.user_id); 
     const userId: number = 19;
-    console.log("exchangePublicToken method: userID is", userId);
     await insertPlaidItem(userId, ACCESS_TOKEN);
 
     res.status(200).json({ public_token_exchange: "complete" });
@@ -137,13 +137,10 @@ async function fetchBankNameFromInstitutionId(institutionId: string): Promise<st
 export const getAccountsOverview = async (req: Request, res: Response) => {
   try {
     const response = await client.accountsGet({
+      // TODO: use the correct access token
       access_token: "access-sandbox-a71749d2-ee2e-47f4-9efc-1e291a10e94a",
       // access_token: ACCESS_TOKEN,
     });
-
-    console.log("\n\nRESPONSE DATA\n\n");
-    console.log(response.data);
-    console.log("\n\nRESPONSE DATA\n\n");
 
     const institutionId = response.data.item.institution_id ? response.data.item.institution_id : "";
     const bankName = await fetchBankNameFromInstitutionId(institutionId);
@@ -163,9 +160,6 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
       accountsOverview
     };
 
-    console.log("\n\nRESPONSE\n\n");
-    console.log(overviewResponse);
-    console.log("\n\nRESPONSE\n\n");
     res.status(200).json(overviewResponse);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
