@@ -34,12 +34,16 @@ export const buildLinearRegression = async (user_id: number) => {
   let numerator = 0;
   let denominator = 0;
   let accumulate_y = 0;
-  let mu_x = user_spent["rows"].length / 2;
+  let mu_x = (user_spent["rows"].length - 1) / 2;
   let mu_y = 0;
 
   //Determine means
   for (let i = 0; i < user_spent["rows"].length; i++) {
-    accumulate_y -= user_spent["rows"][i]["spent_amount"];
+    let amt = user_spent["rows"][i]["spent_amount"];
+    if (amt === 0){
+      amt = 0;
+    }
+    accumulate_y -= amt;
     mu_y += accumulate_y;
   }
   mu_y /= user_spent["rows"].length;
@@ -47,7 +51,11 @@ export const buildLinearRegression = async (user_id: number) => {
   //OLS
   accumulate_y = 0;
   for (let i = 0; i < user_spent["rows"].length; i++) {
-    accumulate_y -= user_spent["rows"][i]["spent_amount"];
+    let amt = user_spent["rows"][i]["spent_amount"];
+    if (amt === 0){
+      amt = 0;
+    }
+    accumulate_y -= amt;
     numerator += (i - mu_x) * (accumulate_y - mu_y);
     denominator += (i - mu_x) * (i - mu_x);
   }
