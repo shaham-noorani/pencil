@@ -40,7 +40,7 @@ export const buildLinearRegression = async (user_id: number) => {
   //Determine means
   for (let i = 0; i < user_spent["rows"].length; i++) {
     let amt = user_spent["rows"][i]["spent_amount"];
-    if (amt === 0){
+    if (amt <= 0){
       amt = 0;
     }
     accumulate_y -= amt;
@@ -52,7 +52,7 @@ export const buildLinearRegression = async (user_id: number) => {
   accumulate_y = 0;
   for (let i = 0; i < user_spent["rows"].length; i++) {
     let amt = user_spent["rows"][i]["spent_amount"];
-    if (amt === 0){
+    if (amt <= 0){
       amt = 0;
     }
     accumulate_y -= amt;
