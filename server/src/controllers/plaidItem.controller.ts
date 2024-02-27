@@ -102,3 +102,36 @@ export const createPlaidItem = async (req: Request, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const insertPlaidItem = async (userId: number, token: string) => {
+  try {
+    console.log("INSERT PLAID ITEM METHOD WAS CALLED");
+    const existingItems = await pool.query(
+      "SELECT COUNT(*) FROM plaid_item WHERE token = $1",
+      [token],
+    );
+    console.log("CHECKED FOR EXISTING ITEMS");
+    const nExistingItems = Number(existingItems.rows[0].count);
+    if (nExistingItems > 0) {
+      throw new Error("Token already registered");
+    }
+    console.log("DID NOT FIND EXISTING ITEMS");
+    console.log("token was", token);
+    console.log("user_id was", userId);
+    console.log("type of user_id is: ", typeof(userId));
+
+    const result = await pool.query(
+      "INSERT INTO plaid_item (token, user_id) VALUES ($1, $2) RETURNING *",
+      [token, userId],
+    );
+    console.log("INSERTED PLAID ITEM INTO TABLE");
+    return result.rows[0];
+  } catch (error) {
+    const e = error as Error;
+    console.log("ERROR IN PLAID ITEM");
+    console.error("Error Name:", e.name);
+    console.error("Error Message:", e.message);
+    console.error("Stack Trace:", e.stack); 
+    throw error;
+  }
+};

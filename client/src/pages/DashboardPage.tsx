@@ -9,41 +9,19 @@ import useUser from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
+import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
+import CashAccount from "../models/cashAccount.model";
 
-interface Account {
-  account_id: string;
-  balances: {
-    available: number;
-    current: number;
-    iso_currency_code: string;
-    limit: null | number;
-    unofficial_currency_code: null | string;
-  };
-  mask: string;
-  name: string;
-  official_name: string;
-  persistent_account_id: string;
-  subtype: string;
-  type: string;
+interface NetWorthEntry {
+  id: number;
+  start_date: string;
+  end_date: string;
+  amount: number;
+  user_id: number;
 }
 
-interface AccountsOverview {
-  depository: Account[];
-  investment: Account[];
-  creditCard: Account[];
-  loans: Account[];
-}
-
-interface AccountsOverviewResponse {
-  bankName: string;
-  accountsOverview: AccountsOverview;
-}
-
-interface CashAccount {
-  bankName: string;
-  last4CCNumber: string;
-  bankNickname: string;
-  value: number;
+interface NetWorthDataResponse {
+  netWorths: NetWorthEntry[];
 }
 
 const DashboardPage = () => {
@@ -55,12 +33,21 @@ const DashboardPage = () => {
 
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
+  const [totalCashBalance, setTotalCashBalance] = useState<number>(0);
+  const [netWorthToday, setNetWorthToday] = useState<number>(0);
+  const [netWorth1DaysAgo, setNetWorth1DaysAgo] = useState<number>(0);
+  const [netWorth2DaysAgo, setNetWorth2DaysAgo] = useState<number>(0);
+  const [netWorth3DaysAgo, setNetWorth3DaysAgo] = useState<number>(0);
+  const [netWorth4DaysAgo, setNetWorth4DaysAgo] = useState<number>(0);
+  const [netWorth5DaysAgo, setNetWorth5DaysAgo] = useState<number>(0);
+  const [netWorth6DaysAgo, setNetWorth6DaysAgo] = useState<number>(0);
 
 
+  
   useEffect(() => {
     me().then((user) => {
       axiosPrivate
-        .get(`/plaid/user/${user.id}`)
+        .get(`/plaidItem/user/${user.id}`)
         .catch(() => {
           navigate("/connect-account");
         })
@@ -83,6 +70,34 @@ const DashboardPage = () => {
     fetchAccountsOverview();
   }, []);
 
+  useEffect(() => {
+    const fetchUserNetWorthData = async () => {
+      try {
+        const { data } = await axiosPrivate.get(`/netWorth/user/last7/${user.id}`);
+        console.log("Net worth data response:", data);
+        processUserNetWorths(data);
+      } catch (error) {
+        console.error('Failed to fetch net worth data:', error);
+      }
+    };
+  
+    if (user?.id) { 
+      fetchUserNetWorthData();
+    }
+  }, []); // Depend on user.id to ensure it's available
+  
+  const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
+    // Assuming the netWorths array is already sorted by start_date in descending order
+    const netWorthValues = netWorths.map(nw => nw.amount);
+    setNetWorthToday(netWorthValues[0] ?? 0);
+    setNetWorth1DaysAgo(netWorthValues[1] ?? 0);
+    setNetWorth2DaysAgo(netWorthValues[2] ?? 0);
+    setNetWorth3DaysAgo(netWorthValues[3] ?? 0);
+    setNetWorth4DaysAgo(netWorthValues[4] ?? 0);
+    setNetWorth5DaysAgo(netWorthValues[5] ?? 0);
+    setNetWorth6DaysAgo(netWorthValues[6] ?? 0);
+  };
+    
   const processAccountsOverview = (data: AccountsOverviewResponse) => {
     const cashAccountsList = data.accountsOverview.depository?.map(account => ({
       bankName: data.bankName,
@@ -95,6 +110,11 @@ const DashboardPage = () => {
     console.log("\n\ncashAccountsList\n\n");
     console.log(cashAccountsList);
     console.log("\n\ncashAccountsList\n\n");
+    // Calculate the total cash balance
+    const total = cashAccountsList.reduce((sum, account) => sum + account.value, 0);
+    // Assuming totalCashBalance is also a state variable you might want to update
+    setTotalCashBalance(total); // You would need to declare this state variable similarly to how you've declared cashAccounts
+
   }
 
   if (loading) {
@@ -104,22 +124,7 @@ const DashboardPage = () => {
       </Center>
     );
   }
-
-  // TODO
-  // now that we have users cash accounts retrieved from API call, and we are ready to display in CashTabComponent, 
-  //   how do we store the user + plaiditem in the plaid_item table?
-
-  const totalCashBalance = 0;
-  const totalInvestmentsBalance = 0;
-  const totalCreditCardsBalance = 0;
-  const totalLoansBalance = 0;
-  const netWorthToday = (totalCashBalance + totalInvestmentsBalance) - (totalCreditCardsBalance + totalLoansBalance); 
-  const netWorthYesterday = 9000; // how to calculate this?
-  const goalSavingsAmount = 0;
-  const monthlyBudget = 0;
-  const remainingBudgetThisMonth = 0;
-  const projectedSavingsAmount = 0;
-
+  
   return (
     <VStack
       height="100vh"
@@ -139,7 +144,7 @@ const DashboardPage = () => {
         </Box> */}
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
           <NetWorthChange
-            netWorthYesterday={netWorthYesterday}
+            netWorthYesterday={netWorth1DaysAgo}
             netWorthToday={netWorthToday}
           />
           <NetWorthValue netWorth={netWorthToday} />
@@ -177,3 +182,14 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
+// const totalCashBalance = 0;
+// const totalInvestmentsBalance = 0;
+// const totalCreditCardsBalance = 0;
+// const totalLoansBalance = 0;
+// const netWorthToday = (totalCashBalance + totalInvestmentsBalance) - (totalCreditCardsBalance + totalLoansBalance); 
+// const netWorthYesterday = 9000;
+// const goalSavingsAmount = 0;
+// const monthlyBudget = 0;
+// const remainingBudgetThisMonth = 0;
+// const projectedSavingsAmount = 0;

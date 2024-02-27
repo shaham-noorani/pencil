@@ -9,6 +9,7 @@ import {
   PlaidEnvironments,
   Products,
 } from "plaid";
+import { insertPlaidItem } from "./plaidItem.controller";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -103,9 +104,14 @@ export const exchangePublicToken = async (req: Request, res: Response) => {
 
     // These values should be saved to a persistent database and
     // associated with the currently signed-in user
-    //currently storing them locally
+    // currently storing them locally
     ACCESS_TOKEN = response.data.access_token;
     ITEM_ID = response.data.item_id;
+    console.log("req.params are\n", req.params, "\n");
+    // const userId: number = Number(req.params.user_id); 
+    const userId: number = 19;
+    console.log("exchangePublicToken method: userID is", userId);
+    await insertPlaidItem(userId, ACCESS_TOKEN);
 
     res.status(200).json({ public_token_exchange: "complete" });
   } catch (error: any) {
@@ -131,7 +137,8 @@ async function fetchBankNameFromInstitutionId(institutionId: string): Promise<st
 export const getAccountsOverview = async (req: Request, res: Response) => {
   try {
     const response = await client.accountsGet({
-      access_token: ACCESS_TOKEN,
+      access_token: "access-sandbox-a71749d2-ee2e-47f4-9efc-1e291a10e94a",
+      // access_token: ACCESS_TOKEN,
     });
 
     console.log("\n\nRESPONSE DATA\n\n");
