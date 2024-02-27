@@ -95,7 +95,7 @@ const DashboardPage = () => {
       value: netWorthValues[index]
     }));
     setNetWorthData(netWorthData);
-  }, [netWorthToday, netWorth1DaysAgo, netWorth2DaysAgo, netWorth3DaysAgo, netWorth4DaysAgo, netWorth5DaysAgo, netWorth6DaysAgo]);
+  }, [netWorthToday, netWorth1DaysAgo, netWorth2DaysAgo, netWorth3DaysAgo, netWorth4DaysAgo, netWorth5DaysAgo, netWorth6DaysAgo]); // TODO: fix dependencies?
   
   const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
     const netWorthValues = netWorths.map(nw => nw.amount);
