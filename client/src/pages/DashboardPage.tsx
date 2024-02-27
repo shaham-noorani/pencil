@@ -12,6 +12,8 @@ import useMe from "../modules/auth/useMe";
 import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
 import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
+import { getDayLabels } from '../utils/getDayLabels'; // Assume this is a utility function you've created
+import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 
 const DashboardPage = () => {
   const { user }: any = useUser();
@@ -30,6 +32,10 @@ const DashboardPage = () => {
   const [netWorth4DaysAgo, setNetWorth4DaysAgo] = useState<number>(0);
   const [netWorth5DaysAgo, setNetWorth5DaysAgo] = useState<number>(0);
   const [netWorth6DaysAgo, setNetWorth6DaysAgo] = useState<number>(0);
+  const [maxNetWorth, setMaxNetWorth] = useState<number>(0);
+  const [minNetWorth, setMinNetWorth] = useState<number>(0);
+  const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
+  const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
   useEffect(() => {
     me().then((user) => {
@@ -71,9 +77,31 @@ const DashboardPage = () => {
       fetchUserNetWorthData();
     }
   }, []);
+
+  useEffect(() => {
+    const netWorthValues = [
+      netWorth6DaysAgo,
+      netWorth5DaysAgo,
+      netWorth4DaysAgo,
+      netWorth3DaysAgo,
+      netWorth2DaysAgo,
+      netWorth1DaysAgo,
+      netWorthToday,
+    ];
+    const dayLabels = getDayLabels();
+  
+    const netWorthData = dayLabels.map((label, index) => ({
+      name: label,
+      value: netWorthValues[index]
+    }));
+    setNetWorthData(netWorthData);
+  }, [netWorthToday, netWorth1DaysAgo, netWorth2DaysAgo, netWorth3DaysAgo, netWorth4DaysAgo, netWorth5DaysAgo, netWorth6DaysAgo]);
   
   const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
     const netWorthValues = netWorths.map(nw => nw.amount);
+    const maxNetWorth = Math.max(...netWorthValues);
+    const minNetWorth = Math.min(...netWorthValues);
+    const maxNetWorthDifference = maxNetWorth - minNetWorth;  
 
     setNetWorthToday(netWorthValues[0] ?? 0);
     setNetWorth1DaysAgo(netWorthValues[1] ?? 0);
@@ -82,6 +110,10 @@ const DashboardPage = () => {
     setNetWorth4DaysAgo(netWorthValues[4] ?? 0);
     setNetWorth5DaysAgo(netWorthValues[5] ?? 0);
     setNetWorth6DaysAgo(netWorthValues[6] ?? 0);
+
+    setMaxNetWorth(maxNetWorth);
+    setMinNetWorth(minNetWorth);
+    setMaxNetWorthDifference(maxNetWorthDifference);
   };
     
   const processAccountsOverview = (data: AccountsOverviewResponse) => {
@@ -122,7 +154,12 @@ const DashboardPage = () => {
             netWorthToday={netWorthToday}
           />
           <NetWorthValue netWorth={netWorthToday} />
-          <LinechartNetWorth />
+          <LinechartNetWorth 
+            data={netWorthData}
+            maxNetWorthDifference={maxNetWorthDifference}
+            maxNetWorth={maxNetWorth}
+            minNetWorth={minNetWorth}
+          />
         </Box>
       </Box>
       <Box
