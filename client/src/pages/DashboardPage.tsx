@@ -12,11 +12,10 @@ import useMe from "../modules/auth/useMe";
 import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
 import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
-import { getDayLabels } from '../utils/getDayLabels'; // Assume this is a utility function you've created
+import { getDayLabels } from "../utils/getDayLabels"; // Assume this is a utility function you've created
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 
 const DashboardPage = () => {
-  const { user }: any = useUser();
   const me = useMe();
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -45,38 +44,31 @@ const DashboardPage = () => {
           navigate("/connect-account");
         })
         .then(() => {
+          fetchAccountsOverview();
+          fetchUserNetWorthData(user);
           setLoading(false);
         });
     });
   }, []);
 
-  useEffect(() => {
-    const fetchAccountsOverview = async () => {
-      try {
-        const { data } = await axiosPrivate.get('/plaid/get_accounts_overview');
-        processAccountsOverview(data);
-      } catch (error) {
-        console.error('Failed to fetch accounts overview:', error);
-      }
-    };
-  
-    fetchAccountsOverview();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserNetWorthData = async () => {
-      try {
-        const { data } = await axiosPrivate.get(`/netWorth/user/last7/${user.id}`);
-        processUserNetWorths(data);
-      } catch (error) {
-        console.error('Failed to fetch net worth data:', error);
-      }
-    };
-  
-    if (user?.id) { 
-      fetchUserNetWorthData();
+  const fetchAccountsOverview = async () => {
+    try {
+      const { data } = await axiosPrivate.get("/plaid/get_accounts_overview");
+      processAccountsOverview(data);
+    } catch (error) {
+      console.error("Failed to fetch accounts overview:", error);
     }
-  }, []);
+  };
+  const fetchUserNetWorthData = async (user: any) => {
+    try {
+      const { data } = await axiosPrivate.get(
+        `/netWorth/user/last7/${user.id}`
+      );
+      processUserNetWorths(data);
+    } catch (error) {
+      console.error("Failed to fetch net worth data:", error);
+    }
+  };
 
   useEffect(() => {
     const netWorthValues = [
@@ -89,19 +81,27 @@ const DashboardPage = () => {
       netWorthToday,
     ];
     const dayLabels = getDayLabels();
-  
+
     const netWorthData = dayLabels.map((label, index) => ({
       name: label,
-      value: netWorthValues[index]
+      value: netWorthValues[index],
     }));
     setNetWorthData(netWorthData);
-  }, [netWorthToday, netWorth1DaysAgo, netWorth2DaysAgo, netWorth3DaysAgo, netWorth4DaysAgo, netWorth5DaysAgo, netWorth6DaysAgo]); // TODO: fix dependencies?
-  
+  }, [
+    netWorthToday,
+    netWorth1DaysAgo,
+    netWorth2DaysAgo,
+    netWorth3DaysAgo,
+    netWorth4DaysAgo,
+    netWorth5DaysAgo,
+    netWorth6DaysAgo,
+  ]);
+
   const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
-    const netWorthValues = netWorths.map(nw => nw.amount);
+    const netWorthValues = netWorths.map((nw) => nw.amount);
     const maxNetWorth = Math.max(...netWorthValues);
     const minNetWorth = Math.min(...netWorthValues);
-    const maxNetWorthDifference = maxNetWorth - minNetWorth;  
+    const maxNetWorthDifference = maxNetWorth - minNetWorth;
 
     setNetWorthToday(netWorthValues[0] ?? 0);
     setNetWorth1DaysAgo(netWorthValues[1] ?? 0);
@@ -115,19 +115,23 @@ const DashboardPage = () => {
     setMinNetWorth(minNetWorth);
     setMaxNetWorthDifference(maxNetWorthDifference);
   };
-    
-  const processAccountsOverview = (data: AccountsOverviewResponse) => {
-    const cashAccountsList = data.accountsOverview.depository?.map(account => ({
-      bankName: data.bankName,
-      last4CCNumber: account.mask,
-      bankNickname: account.name,
-      value: account.balances.available,
-    })) || [];
 
-    const total = cashAccountsList.reduce((sum, account) => sum + account.value, 0);
+  const processAccountsOverview = (data: AccountsOverviewResponse) => {
+    const cashAccountsList =
+      data.accountsOverview.depository?.map((account) => ({
+        bankName: data.bankName,
+        last4CCNumber: account.mask,
+        bankNickname: account.name,
+        value: account.balances.available,
+      })) || [];
+
+    const total = cashAccountsList.reduce(
+      (sum, account) => sum + account.value,
+      0
+    );
     setTotalCashBalance(total);
     setCashAccounts(cashAccountsList);
-  }
+  };
 
   if (loading) {
     return (
@@ -136,7 +140,7 @@ const DashboardPage = () => {
       </Center>
     );
   }
-  
+
   return (
     <VStack
       height="100vh"
@@ -154,7 +158,7 @@ const DashboardPage = () => {
             netWorthToday={netWorthToday}
           />
           <NetWorthValue netWorth={netWorthToday} />
-          <LinechartNetWorth 
+          <LinechartNetWorth
             data={netWorthData}
             maxNetWorthDifference={maxNetWorthDifference}
             maxNetWorth={maxNetWorth}

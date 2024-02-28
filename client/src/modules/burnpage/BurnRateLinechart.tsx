@@ -10,20 +10,16 @@ import {
 
 interface LinechartBurnPageProps {
   data: {
-    name: string;
-    value: number;
+    date: string;
+    actualUserBalance: number | null;
+    goalUserBalance: number | null;
+    projectedUserBalance: number | null;
   }[];
   maxDifference: number;
   maxValue: number;
   minValue: number;
-  projectedMayData: {
-    name: string;
-    value: number;
-  };
-  goalMayData: {
-    name: string;
-    value: number;
-  };
+  projectedMayBalance: number;
+  goalMayBalance: number;
 }
 
 const BurnRateLinechart = ({
@@ -31,38 +27,41 @@ const BurnRateLinechart = ({
   maxDifference,
   maxValue,
   minValue,
-  projectedMayData,
-  goalMayData,
+  projectedMayBalance,
+  goalMayBalance,
 }: LinechartBurnPageProps) => {
   const yAxisDomain = [
     minValue - maxDifference * 0.1,
     maxValue + maxDifference * 0.1,
   ];
-  const todayToProjectedMayData = [data[data.length - 1], projectedMayData];
-  const todayToGoalMayData = [data[data.length - 1], goalMayData];
   const projectedLineColor =
-    projectedMayData.value >= goalMayData.value ? "green" : "red";
+    projectedMayBalance >= goalMayBalance ? "green" : "red";
   const schoolEndDate = new Date("2024-05-01");
   const augustStartDate = new Date("2023-08-01");
 
   return (
     <Box width="full" height="250px">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart width={600} height={300} margin={{ right: 10, left: -50 }}>
+        <LineChart data={data} margin={{ right: 10, left: -50 }}>
           <XAxis
-            domain={[
-              augustStartDate.toLocaleDateString(),
-              schoolEndDate.toLocaleDateString(),
-            ]}
+            domain={[augustStartDate.getTime(), schoolEndDate.getTime()]}
+            // scale="time"
+            // type="number"
             stroke="white"
             tick={false}
-            dataKey="name"
+            dataKey="date"
           />
           <YAxis domain={yAxisDomain} stroke="white" tick={false} />
           <Tooltip />
-          <Line type="monotone" data={data} dataKey="value" stroke="#FFD700" dot={false}/>
-          <Line type="monotone" data={todayToGoalMayData} dataKey="value" stroke="#808080" dot={false}/>
-          <Line type="monotone" data={todayToProjectedMayData} dataKey="value" stroke={projectedLineColor} dot={false}/>
+          <Line type="linear" dataKey="actualUserBalance" stroke="yellow" dot={false} />
+          <Line type="linear" dataKey="goalUserBalance" stroke="gray" dot={false} />
+          <Line
+            type="linear"
+            dataKey="projectedUserBalance"
+            stroke={projectedLineColor}
+            strokeDasharray="5 5"
+            dot={false}
+          />
         </LineChart>
       </ResponsiveContainer>
     </Box>
