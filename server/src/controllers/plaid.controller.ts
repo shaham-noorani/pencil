@@ -22,7 +22,6 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
 
     //const transactions = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
     const transactions = await getSyncedTransactions(access_token, "");
-    console.log(transactions.length);
     await addTransactionArrayToSpendings(user.id, transactions);
     res.status(200).json({ public_token_exchange: "complete" });
   } catch (error: any) {
