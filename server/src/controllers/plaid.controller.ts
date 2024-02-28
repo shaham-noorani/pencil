@@ -6,7 +6,7 @@ import { AccountBase } from "plaid";
 
 export const createLinkToken = async (req: Request, res: Response) => {
   try {
-    const createTokenResponse = await createPlaidLinkToken('samyukt30');
+    const createTokenResponse = await createPlaidLinkToken(req.body.email);
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
