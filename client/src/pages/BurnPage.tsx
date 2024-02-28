@@ -88,16 +88,16 @@ const BurnPage: React.FC = () => {
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
     setProjectedUserBalanceInMay(projectedSavingsInMay);
-    console.log("User Balance Today: ", userBalanceToday);
-    console.log(
-      "Projected User Spending Per Day: ",
-      projectedUserSpendingPerDay
-    );
-    console.log(
-      "Remaining Days Until School End: ",
-      remainingDaysUntilSchoolEnd
-    );
-    console.log("Projected User Balance In May: ", projectedUserBalanceInMay);
+    // console.log("User Balance Today: ", userBalanceToday);
+    // console.log(
+    //   "Projected User Spending Per Day: ",
+    //   projectedUserSpendingPerDay
+    // );
+    // console.log(
+    //   "Remaining Days Until School End: ",
+    //   remainingDaysUntilSchoolEnd
+    // );
+    // console.log("Projected User Balance In May: ", projectedUserBalanceInMay);
   };
 
   const calculateAmountSpentThisMonth = (balanceChanges: {
@@ -107,7 +107,7 @@ const BurnPage: React.FC = () => {
       .filter(([date]) => new Date(date) >= startOfMonth)
       .reduce((acc, [, value]) => acc + value, 0);
     setAmountSpentThisMonth(balanceChangeThisMonth);
-    console.log("Amount Spent This Month: ", amountSpentThisMonth); // is negative if we made money this month
+    // console.log("Amount Spent This Month: ", amountSpentThisMonth); // is negative if we made money this month
   };
 
   const calculateUserBalanceAtStartOfMonth = () => {
@@ -214,22 +214,11 @@ const BurnPage: React.FC = () => {
     console.log("\n\nupdatedLineChartData\n\n");
   };
 
-  useEffect(() => {
-    me().then((user) => {
-      if (user.burn_rate_goal === null) {
-        navigate("/burn-rate-goal");
-      } else {
-        fetchAccountsOverview()
-          .then(() => fetchAccountBalancesOverTime())
-          .then(() => setLoading(false));
-      }
-    });
-  }, []);
-
   const fetchAccountsOverview = async () => {
     try {
       const { data } = await axiosPrivate.get("/plaid/get_accounts_overview");
       processAccountsOverview(data);
+      return;
     } catch (error) {
       console.error("Failed to fetch accounts overview:", error);
     }
@@ -237,25 +226,39 @@ const BurnPage: React.FC = () => {
 
   const fetchAccountBalancesOverTime = async () => {
     try {
-      axiosPrivate
-        .get("/plaid/get_account_balances_over_time")
-        .then((response) => {
-          setBalanceChanges(response.data as { [key: string]: number });
-          calculateAmountSpentThisMonth(balanceChanges);
-          calculateUserBalanceAtStartOfMonth();
-          calculateMonthlyAndRemainingBudget();
-          calculateUserBalanceInAndUserBalanceChangeSinceAugust(balanceChanges);
-          processUserBalanceDataFromAugustToToday(balanceChanges);
-          createLinechartData(
-            userBalanceDataFromAugustToToday,
-            projectedUserBalanceInMay,
-            goalSavings
-          );
-        });
+      return axiosPrivate
+        .get("/plaid/get_account_balances_over_time").then((response) => response.data);
     } catch (error) {
       console.error("Failed to fetch account balances over time:", error);
     }
   };
+
+  // useEffect for loading data before page renders
+  useEffect(() => {
+    me().then((user) => {
+      if (user.burn_rate_goal === null) {
+        navigate("/burn-rate-goal");
+      } else {
+        fetchAccountsOverview()
+          .then(() => fetchAccountBalancesOverTime())
+          .then((data) => {
+              setBalanceChanges(data as { [key: string]: number });
+              calculateAmountSpentThisMonth(balanceChanges);
+              calculateUserBalanceAtStartOfMonth();
+              calculateMonthlyAndRemainingBudget();
+              calculateUserBalanceInAndUserBalanceChangeSinceAugust(balanceChanges);
+              processUserBalanceDataFromAugustToToday(balanceChanges);
+              createLinechartData(
+                userBalanceDataFromAugustToToday,
+                projectedUserBalanceInMay,
+                goalSavings
+              );              
+            setLoading(false);
+            console.log("loading = ", loading);
+          });
+      }
+    });
+  }, []);
 
   if (loading) {
     return (
@@ -280,6 +283,7 @@ const BurnPage: React.FC = () => {
             goalSavings={goalSavings}
           />
           <BurnRateLinechart
+          loadingChart={loading}
             data={linechartData}
             maxDifference={maxDataDifference}
             maxValue={maxBalanceData}
