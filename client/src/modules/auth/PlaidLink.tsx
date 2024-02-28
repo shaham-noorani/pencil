@@ -25,7 +25,7 @@ const PlaidLink = () => {
 
   const onSuccess = React.useCallback(async (temp_token: string) => {
     // send public_token to server
-    const response = await axiosPrivate.post("/plaid/exchange_public_token", {
+    const response = await axiosPrivate.post("/plaid/item_inital_setup", {
       public_token: temp_token,
     });
     navigate("/dashboard");
