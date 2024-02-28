@@ -1,20 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
+import LineChartData from "../models/burnpageLinechartData.model";
+
+import { schoolEndDate, today } from "../utils/constants";
+
+import useMe from "../modules/auth/useMe";
+import useUser from "../hooks/useUser";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+
 import { Box, Center, Spinner, VStack } from "@chakra-ui/react";
+
 import BurnRateHeader from "../modules/burnpage/BurnRateHeader";
 import BurnRateOnTrack from "../modules/burnpage/BurnRateOnTrack";
 import BurnRateLinechart from "../modules/burnpage/BurnRateLinechart";
 import BalanceBudgetGoalBox from "../modules/burnpage/BalanceBudgetGoalBox";
-import { useNavigate } from "react-router-dom";
-import useMe from "../modules/auth/useMe";
-import useUser from "../hooks/useUser";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
-import { differenceInCalendarDays, differenceInCalendarMonths } from "date-fns";
-import LineChartData from "../models/burnpageLinechartData.model";
-
-const schoolEndDate = new Date("2024-05-01");
-const augustStartDate = new Date("2023-08-01");
-const today = new Date().setHours(0, 0, 0, 0);
+import {
+  monthsFromTodayToMay,
+  remainingDaysUntilSchoolEnd,
+  startOfMonth,
+} from "../modules/burnpage/utils";
+import {
+  fetchAccountBalancesOverTime,
+  fetchAccountsOverview,
+} from "../modules/burnpage/fetches";
 
 const BurnPage: React.FC = () => {
   // Hooks and context usage
@@ -51,24 +61,10 @@ const BurnPage: React.FC = () => {
   const [maxBalanceData, setMaxBalanceData] = useState<number>(0);
   const [maxDataDifference, setMaxDataDifference] = useState<number>(0);
   const [linechartData, setLinechartData] = useState<LineChartData[]>([]);
+
   // User's savings goal and spending slope
   const goalSavings = user?.burn_rate_goal ?? 0;
   const projectedUserSpendingPerDay = (user?.slope ?? 0) / 7;
-
-  // Time-related calculations
-  const remainingDaysUntilSchoolEnd = Math.ceil(
-    (schoolEndDate.getTime() - today) / (1000 * 60 * 60 * 24)
-  );
-  const daysFromAugustToToday = Math.abs(
-    differenceInCalendarDays(new Date(today), augustStartDate)
-  );
-  const monthsFromTodayToMay =
-    1 + differenceInCalendarMonths(schoolEndDate, new Date(today));
-  const startOfMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  );
 
   // Helper Functions
   const processAccountsOverview = (data: AccountsOverviewResponse) => {
@@ -88,16 +84,6 @@ const BurnPage: React.FC = () => {
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
     setProjectedUserBalanceInMay(projectedSavingsInMay);
-    // console.log("User Balance Today: ", userBalanceToday);
-    // console.log(
-    //   "Projected User Spending Per Day: ",
-    //   projectedUserSpendingPerDay
-    // );
-    // console.log(
-    //   "Remaining Days Until School End: ",
-    //   remainingDaysUntilSchoolEnd
-    // );
-    // console.log("Projected User Balance In May: ", projectedUserBalanceInMay);
   };
 
   const calculateAmountSpentThisMonth = (balanceChanges: {
@@ -107,7 +93,6 @@ const BurnPage: React.FC = () => {
       .filter(([date]) => new Date(date) >= startOfMonth)
       .reduce((acc, [, value]) => acc + value, 0);
     setAmountSpentThisMonth(balanceChangeThisMonth);
-    // console.log("Amount Spent This Month: ", amountSpentThisMonth); // is negative if we made money this month
   };
 
   const calculateUserBalanceAtStartOfMonth = () => {
@@ -164,9 +149,6 @@ const BurnPage: React.FC = () => {
     });
 
     setUserBalanceDataFromAugustToToday(userBalanceDataPointsFromAugustToToday);
-    console.log("\n\nuserBalanceDataFromAugustToToday\n\n");
-    console.log(userBalanceDataFromAugustToToday);
-    console.log("\n\nuserBalanceDataFromAugustToToday\n\n");
   };
 
   const createLinechartData = (
@@ -184,7 +166,7 @@ const BurnPage: React.FC = () => {
 
         return {
           date: data.date,
-          actualUserBalance: isToday ? data.value : data.value,
+          actualUserBalance: data.value,
           goalUserBalance: isToday ? data.value : null,
           projectedUserBalance: isToday ? data.value : null,
         };
@@ -201,64 +183,42 @@ const BurnPage: React.FC = () => {
     );
     balanceValues.push(projectedBalanceOnMay1, goalSavingsOnMay1);
 
-    const minValue = Math.min(...balanceValues);
-    const maxValue = Math.max(...balanceValues);
-    const maxDifference = maxValue - minValue;
-    setMinBalanceData(minValue);
-    setMaxBalanceData(maxValue);
-    setMaxDataDifference(maxDifference);
+    setMinBalanceData(Math.min(...balanceValues));
+    setMaxBalanceData(Math.max(...balanceValues));
+    setMaxDataDifference(minBalanceData - maxBalanceData);
 
     setLinechartData(updatedLineChartData);
-    console.log("\n\nupdatedLineChartData\n\n");
-    console.log(updatedLineChartData);
-    console.log("\n\nupdatedLineChartData\n\n");
   };
 
-  const fetchAccountsOverview = async () => {
-    try {
-      const { data } = await axiosPrivate.get("/plaid/get_accounts_overview");
-      processAccountsOverview(data);
+  const loadData = useCallback(async () => {
+    const userData = await me();
+    if (!userData || userData.burn_rate_goal === null) {
+      navigate("/burn-rate-goal");
       return;
-    } catch (error) {
-      console.error("Failed to fetch accounts overview:", error);
     }
-  };
 
-  const fetchAccountBalancesOverTime = async () => {
-    try {
-      return axiosPrivate
-        .get("/plaid/get_account_balances_over_time").then((response) => response.data);
-    } catch (error) {
-      console.error("Failed to fetch account balances over time:", error);
-    }
-  };
+    const overviewData = await fetchAccountsOverview(axiosPrivate);
+    const balanceData = await fetchAccountBalancesOverTime(axiosPrivate);
+    processAccountsOverview(overviewData);
+
+    setBalanceChanges(balanceData as { [key: string]: number });
+    calculateAmountSpentThisMonth(balanceChanges);
+    calculateUserBalanceAtStartOfMonth();
+    calculateMonthlyAndRemainingBudget();
+    calculateUserBalanceInAndUserBalanceChangeSinceAugust(balanceChanges);
+    processUserBalanceDataFromAugustToToday(balanceChanges);
+    createLinechartData(
+      userBalanceDataFromAugustToToday,
+      projectedUserBalanceInMay,
+      goalSavings
+    );
+  }, [me, navigate, axiosPrivate]);
 
   // useEffect for loading data before page renders
   useEffect(() => {
-    me().then((user) => {
-      if (user.burn_rate_goal === null) {
-        navigate("/burn-rate-goal");
-      } else {
-        fetchAccountsOverview()
-          .then(() => fetchAccountBalancesOverTime())
-          .then((data) => {
-              setBalanceChanges(data as { [key: string]: number });
-              calculateAmountSpentThisMonth(balanceChanges);
-              calculateUserBalanceAtStartOfMonth();
-              calculateMonthlyAndRemainingBudget();
-              calculateUserBalanceInAndUserBalanceChangeSinceAugust(balanceChanges);
-              processUserBalanceDataFromAugustToToday(balanceChanges);
-              createLinechartData(
-                userBalanceDataFromAugustToToday,
-                projectedUserBalanceInMay,
-                goalSavings
-              );              
-            setLoading(false);
-            console.log("loading = ", loading);
-          });
-      }
-    });
-  }, []);
+    loadData();
+    setLoading(false);
+  }, [linechartData.length]);
 
   if (loading) {
     return (
@@ -283,7 +243,7 @@ const BurnPage: React.FC = () => {
             goalSavings={goalSavings}
           />
           <BurnRateLinechart
-          loadingChart={loading}
+            loadingChart={loading}
             data={linechartData}
             maxDifference={maxDataDifference}
             maxValue={maxBalanceData}

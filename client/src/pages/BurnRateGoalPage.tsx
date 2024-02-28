@@ -30,9 +30,7 @@ function BurnRateGoal() {
       setTimeout(() => {
         navigate("/burn");
       }, 1000);
-    } catch (error: any) {
-      console.log(error);
-    }
+    } catch (error: any) {}
   };
 
   return (

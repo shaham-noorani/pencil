@@ -49,8 +49,8 @@ const BurnRateLinechart = ({
   }
   return (
     <Box width="full" height="250px">
-      {/* <ResponsiveContainer width="100%" height="100%"> */}
-        {/* <LineChart
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
           key={maxDifference}
           data={data}
           margin={{ right: 10, left: -50 }}
@@ -84,9 +84,11 @@ const BurnRateLinechart = ({
             strokeDasharray="5 5"
             dot={false}
           />
-        </LineChart> */}
-        <Box marginLeft="30px" color="white" >{data.length}</Box>
-      {/* </ResponsiveContainer> */}
+        </LineChart>
+      </ResponsiveContainer>
+      <Box marginLeft="30px" color="white">
+        {data.length}
+      </Box>
     </Box>
   );
 };
