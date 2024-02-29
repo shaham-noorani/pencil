@@ -25,6 +25,7 @@ import {
   fetchAccountBalancesOverTime,
   fetchAccountsOverview,
 } from "../modules/burnpage/fetches";
+import AccountsOverview from "../models/accountsOverview.model";
 
 const BurnPage: React.FC = () => {
   // Hooks and context usage
@@ -68,20 +69,21 @@ const BurnPage: React.FC = () => {
 
   // TODO: clean this up
   // Helper Functions
-  const processAccountsOverview = (data: AccountsOverviewResponse) => {
+  const processAccountsOverview = (data: AccountsOverview) => {
     const cashAccountsList =
-      data.accountsOverview.depository?.map((account) => ({
-        bankName: data.bankName,
+      data.depository?.map((account) => ({
+        bankName: account.institution_name, // Correctly using 'institution_name'
         last4CCNumber: account.mask,
         bankNickname: account.name,
         value: account.balances.available,
       })) || [];
 
     const totalUserCash = cashAccountsList.reduce(
-      (sum, account) => sum + account.value,
+      (sum: number, account: { value: number }) => sum + account.value,
       0
     );
     setUserBalanceToday(totalUserCash);
+
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
     setProjectedUserBalanceInMay(projectedSavingsInMay);
@@ -94,11 +96,17 @@ const BurnPage: React.FC = () => {
       .filter(([date]) => new Date(date) >= startOfMonth)
       .reduce((acc, [, value]) => acc + value, 0);
     setAmountSpentThisMonth(balanceChangeThisMonth);
+    console.log("amountSpentThisMonth");
+    console.log(amountSpentThisMonth);
+    console.log("amountSpentThisMonth");
   };
 
   const calculateUserBalanceAtStartOfMonth = () => {
     const usersBalanceAtStartOfMonth = userBalanceToday - amountSpentThisMonth;
     setUserBalanceAtStartOfMonth(usersBalanceAtStartOfMonth);
+    console.log("userBalanceAtStartOfMonth");
+    console.log(userBalanceAtStartOfMonth);
+    console.log("userBalanceAtStartOfMonth");
   };
 
   const calculateMonthlyAndRemainingBudget = () => {
@@ -127,13 +135,16 @@ const BurnPage: React.FC = () => {
     [key: string]: number;
   }) => {
     let runningTotal = userBalanceInAugust;
+    console.log("userbalanceinaugust");
+    console.log(userBalanceInAugust);
+    console.log("userbalanceinaugust");
     const balanceDataPoints = Object.entries(balanceChanges)
       .sort(
         ([dateA], [dateB]) =>
           new Date(dateA).getTime() - new Date(dateB).getTime()
       )
       .map(([date, change]) => {
-        runningTotal += change;
+        runningTotal -= change;
         return {
           date: new Date(date).toLocaleDateString(),
           value: runningTotal,
@@ -199,10 +210,29 @@ const BurnPage: React.FC = () => {
     }
 
     const overviewData = await fetchAccountsOverview(axiosPrivate);
-    const balanceData = await fetchAccountBalancesOverTime(axiosPrivate);
+    console.log("\n\noverviewData\n\n");
+    console.log(overviewData);
+    console.log("\n\noverviewData\n\n");
+    const balanceData = await fetchAccountBalancesOverTime(
+      axiosPrivate,
+      userData.id
+    );
+    console.log("\n\nbalanceData\n\n");
+    console.log(balanceData);
+    console.log("\n\nbalanceData\n\n");
+    // Transform API response to balanceChanges format.
+    const transformedBalanceChanges = balanceData.reduce(
+      (acc: any, curr: any) => {
+        const startDateStr = new Date(curr.start_date).toLocaleDateString();
+        acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
+        return acc;
+      },
+      {}
+    );
     processAccountsOverview(overviewData);
 
-    setBalanceChanges(balanceData as { [key: string]: number });
+    // setBalanceChanges(balanceData as { [key: string]: number });
+    setBalanceChanges(transformedBalanceChanges);
     calculateAmountSpentThisMonth(balanceChanges);
     calculateUserBalanceAtStartOfMonth();
     calculateMonthlyAndRemainingBudget();

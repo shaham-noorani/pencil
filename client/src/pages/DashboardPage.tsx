@@ -5,15 +5,14 @@ import NetWorthChange from "../modules/dashboard/NetWorthChange";
 import NetWorthValue from "../modules/dashboard/NetWorthValue";
 import CashTabComponent from "../modules/dashboard/CashTabComponent";
 import LinechartNetWorth from "../modules/dashboard/LinechartNetWorth";
-import useUser from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
-import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
 import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
 import { getDayLabels } from "../utils/getDayLabels"; // Assume this is a utility function you've created
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
+import AccountsOverview from "../models/accountsOverview.model";
 
 const DashboardPage = () => {
   const me = useMe();
@@ -116,20 +115,20 @@ const DashboardPage = () => {
     setMaxNetWorthDifference(maxNetWorthDifference);
   };
 
-  const processAccountsOverview = (data: AccountsOverviewResponse) => {
+  const processAccountsOverview = (data: AccountsOverview) => {
     const cashAccountsList =
-      data.accountsOverview.depository?.map((account) => ({
-        bankName: data.bankName,
+      data.depository?.map((account) => ({
+        bankName: account.institution_name,
         last4CCNumber: account.mask,
         bankNickname: account.name,
         value: account.balances.available,
       })) || [];
 
-    const total = cashAccountsList.reduce(
-      (sum, account) => sum + account.value,
+    const totalUserCash = cashAccountsList.reduce(
+      (sum: number, account: { value: number }) => sum + account.value,
       0
     );
-    setTotalCashBalance(total);
+    setTotalCashBalance(totalUserCash);
     setCashAccounts(cashAccountsList);
   };
 

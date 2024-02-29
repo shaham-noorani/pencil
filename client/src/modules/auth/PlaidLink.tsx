@@ -17,9 +17,6 @@ const PlaidLink = () => {
   const [linkToken, setLinkToken] = useState(null);
   const generateToken = async () => {
     const response = await axiosPrivate.get("/plaid/create_link_token");
-    console.log("response");
-    console.log(response);
-    console.log("response");
     setLinkToken(response.data.link_token);
   };
   useEffect(() => {

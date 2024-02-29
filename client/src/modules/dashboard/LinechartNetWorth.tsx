@@ -16,7 +16,7 @@ const LinechartNetWorth = ({
   minNetWorth,
 }: LinechartNetWorthProps) => {
   const lineColor =
-    maxNetWorth >= minNetWorth ? "green" : "red";
+    data[data.length-1].value >= data[0].value ? "green" : "red";
   const yAxisDomain = [
     minNetWorth - maxNetWorthDifference * 0.1,
     maxNetWorth + maxNetWorthDifference * 0.1,
