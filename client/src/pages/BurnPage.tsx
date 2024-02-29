@@ -66,6 +66,7 @@ const BurnPage: React.FC = () => {
   const goalSavings = user?.burn_rate_goal ?? 0;
   const projectedUserSpendingPerDay = (user?.slope ?? 0) / 7;
 
+  // TODO: clean this up
   // Helper Functions
   const processAccountsOverview = (data: AccountsOverviewResponse) => {
     const cashAccountsList =

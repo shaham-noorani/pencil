@@ -86,9 +86,6 @@ const BurnRateLinechart = ({
           />
         </LineChart>
       </ResponsiveContainer>
-      <Box marginLeft="30px" color="white">
-        {data.length}
-      </Box>
     </Box>
   );
 };
