@@ -49,7 +49,7 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
         const account = accounts[i] as PlaidAccount;
 
         if (institution_name) {
-          account.instituion_name = institution_name;
+          account.institution_name = institution_name;
         }
         
         const type: string = account.type;
