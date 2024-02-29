@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 import { getUserByEmail } from "../services/user.service";
 import { createPlaidItem, getPlaidItemsByUserId } from "../services/plaidItem.service";
-import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust } from "../services/plaid.service";
+import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust, getInstitutionIdForPlaidToken, getInstitutionNameForPlaidToken } from "../services/plaid.service";
 import { AccountBase } from "plaid";
+import PlaidAccount from "../models/plaidAccount.model";
 
 export const createLinkToken = async (req: Request, res: Response) => {
   try {
-    const createTokenResponse = await createPlaidLinkToken(req.body.email);
+    const user_id = req.body.email.split("@")[0];
+    const createTokenResponse = await createPlaidLinkToken(user_id);
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -37,13 +39,19 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
       plaid_items = []
     }
     
-    const accountsOverview: { [key: string]: AccountBase[] } = {};
+    const accountsOverview: { [key: string]: PlaidAccount[] } = {};
 
     for (const plaid_item of plaid_items) {
       const accounts = await getAccountsForPlaidToken(plaid_item.token);
+      const institution_name = await getInstitutionNameForPlaidToken(plaid_item.token);
 
       for (let i = 0; i < accounts.length; i++) {
-        const account = accounts[i];
+        const account = accounts[i] as PlaidAccount;
+
+        if (institution_name) {
+          account.institution_name = institution_name;
+        }
+        
         const type: string = account.type;
         if (!(type in accountsOverview)) {
           accountsOverview[type] = [];

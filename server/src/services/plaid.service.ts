@@ -56,13 +56,13 @@ const PLAID_PRODUCTS = (
   
 const client = new PlaidApi(configuration);
 
-export const createPlaidLinkToken = async (user_email: string) => {
+export const createPlaidLinkToken = async (user_id: string) => {
     const request = {
         user: {
           // This should correspond to a unique id for the current user.
-          client_user_id: user_email,
+          client_user_id: user_id,
         },
-        client_name: "Plaid Test App",
+        client_name: "Pencil",
         products: [Products.Auth, Products.Transactions],
         language: "en",
         country_codes: [CountryCode.Us, CountryCode.Ca],
@@ -84,6 +84,21 @@ export const getAccountsForPlaidToken = async (token: string) => {
         access_token: token
       });
     return response.data.accounts;
+}
+
+export const getInstitutionNameForPlaidToken = async (token: string) => {
+    const getItemResponse = await client.itemGet({
+        access_token: token
+      });
+    const instituion_id = getItemResponse.data.item.institution_id;
+    if (instituion_id) {
+        const institutionNameResponse = await client.institutionsGetById({
+            institution_id: instituion_id,
+            country_codes: [CountryCode.Us, CountryCode.Ca]
+        });
+        return institutionNameResponse.data.institution.name;
+    }
+    return "";
 }
 
 export const getSundayOfWeek = (date: Date): Date => {
