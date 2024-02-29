@@ -33,8 +33,8 @@ const BurnRateLinechart = ({
   goalMayBalance,
 }: LinechartBurnPageProps) => {
   const yAxisDomain = [
-    minValue - maxDifference * 0.1,
-    maxValue + maxDifference * 0.1,
+    minValue - maxDifference * 0.3,
+    maxValue + maxDifference * 0.3,
   ];
   const projectedLineColor =
     projectedMayBalance >= goalMayBalance ? "green" : "red";
