@@ -86,11 +86,19 @@ export const getAccountsForPlaidToken = async (token: string) => {
     return response.data.accounts;
 }
 
-export const getInstitutionIdForPlaidToken = async (token: string) => {
-    const response = await client.itemGet({
+export const getInstitutionNameForPlaidToken = async (token: string) => {
+    const getItemResponse = await client.itemGet({
         access_token: token
       });
-    return response.data.item.institution_id;
+    const instituion_id = getItemResponse.data.item.institution_id;
+    if (instituion_id) {
+        const institutionNameResponse = await client.institutionsGetById({
+            institution_id: instituion_id,
+            country_codes: [CountryCode.Us, CountryCode.Ca]
+        });
+        return institutionNameResponse.data.institution.name;
+    }
+    return "";
 }
 
 export const getSundayOfWeek = (date: Date): Date => {
