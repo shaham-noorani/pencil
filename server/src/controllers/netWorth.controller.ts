@@ -44,6 +44,24 @@ export const getNetWorthsByUserId = async (req: Request, res: Response) => {
   }
 };
 
+export const getLatest7NetWorthsByUserId = async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.user_id, 10);
+    const result = await pool.query(
+      "SELECT * FROM user_net_worth WHERE user_id = $1 ORDER BY start_date DESC LIMIT 7",
+      [userId],
+    );
+    const netWorths = result.rows;
+    if (netWorths.length === 0) {
+      return res.status(404).json({ message: "User Net Worth entries not found" });
+    }
+    res.status(200).json(netWorths);
+  } catch (error: any) {
+    console.error('Error fetching user net worth entries:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //Delete Spendings
 export const deleteNetWorth = async (req: Request, res: Response) => {
   try {

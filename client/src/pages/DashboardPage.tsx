@@ -9,32 +9,129 @@ import useUser from "../hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
+import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
+import CashAccount from "../models/cashAccount.model";
+import NetWorthEntry from "../models/netWorthEntry.model";
+import { getDayLabels } from "../utils/getDayLabels"; // Assume this is a utility function you've created
+import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 
 const DashboardPage = () => {
-  const { user }: any = useUser();
   const me = useMe();
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
 
   const [stage, setStage] = useState(0);
-
-  console.log("ABOUT TO PRINT USER STUFF");
-  console.log(user);
-  console.log("JUST PRINTED USER STUFF");
+  const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
+  const [totalCashBalance, setTotalCashBalance] = useState<number>(0);
+  const [netWorthToday, setNetWorthToday] = useState<number>(0);
+  const [netWorth1DaysAgo, setNetWorth1DaysAgo] = useState<number>(0);
+  const [netWorth2DaysAgo, setNetWorth2DaysAgo] = useState<number>(0);
+  const [netWorth3DaysAgo, setNetWorth3DaysAgo] = useState<number>(0);
+  const [netWorth4DaysAgo, setNetWorth4DaysAgo] = useState<number>(0);
+  const [netWorth5DaysAgo, setNetWorth5DaysAgo] = useState<number>(0);
+  const [netWorth6DaysAgo, setNetWorth6DaysAgo] = useState<number>(0);
+  const [maxNetWorth, setMaxNetWorth] = useState<number>(0);
+  const [minNetWorth, setMinNetWorth] = useState<number>(0);
+  const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
+  const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
   useEffect(() => {
     me().then((user) => {
       axiosPrivate
-        .get(`/plaid/user/${user.id}`)
+        .get(`/plaidItem/user/${user.id}`)
         .catch(() => {
           navigate("/connect-account");
         })
         .then(() => {
+          fetchAccountsOverview();
+          fetchUserNetWorthData(user);
           setLoading(false);
         });
     });
   }, []);
+
+  const fetchAccountsOverview = async () => {
+    try {
+      const { data } = await axiosPrivate.get("/plaid/get_accounts_overview");
+      processAccountsOverview(data);
+    } catch (error) {
+      console.error("Failed to fetch accounts overview:", error);
+    }
+  };
+  const fetchUserNetWorthData = async (user: any) => {
+    try {
+      const { data } = await axiosPrivate.get(
+        `/netWorth/user/last7/${user.id}`
+      );
+      processUserNetWorths(data);
+    } catch (error) {
+      console.error("Failed to fetch net worth data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const netWorthValues = [
+      netWorth6DaysAgo,
+      netWorth5DaysAgo,
+      netWorth4DaysAgo,
+      netWorth3DaysAgo,
+      netWorth2DaysAgo,
+      netWorth1DaysAgo,
+      netWorthToday,
+    ];
+    const dayLabels = getDayLabels();
+
+    const netWorthData = dayLabels.map((label, index) => ({
+      name: label,
+      value: netWorthValues[index],
+    }));
+    setNetWorthData(netWorthData);
+  }, [
+    netWorthToday,
+    netWorth1DaysAgo,
+    netWorth2DaysAgo,
+    netWorth3DaysAgo,
+    netWorth4DaysAgo,
+    netWorth5DaysAgo,
+    netWorth6DaysAgo,
+  ]);
+
+  const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
+    const netWorthValues = netWorths.map((nw) => nw.amount);
+    const maxNetWorth = Math.max(...netWorthValues);
+    const minNetWorth = Math.min(...netWorthValues);
+    const maxNetWorthDifference = maxNetWorth - minNetWorth;
+
+    setNetWorthToday(netWorthValues[0] ?? 0);
+    setNetWorth1DaysAgo(netWorthValues[1] ?? 0);
+    setNetWorth2DaysAgo(netWorthValues[2] ?? 0);
+    setNetWorth3DaysAgo(netWorthValues[3] ?? 0);
+    setNetWorth4DaysAgo(netWorthValues[4] ?? 0);
+    setNetWorth5DaysAgo(netWorthValues[5] ?? 0);
+    setNetWorth6DaysAgo(netWorthValues[6] ?? 0);
+
+    setMaxNetWorth(maxNetWorth);
+    setMinNetWorth(minNetWorth);
+    setMaxNetWorthDifference(maxNetWorthDifference);
+  };
+
+  const processAccountsOverview = (data: AccountsOverviewResponse) => {
+    const cashAccountsList =
+      data.accountsOverview.depository?.map((account) => ({
+        bankName: data.bankName,
+        last4CCNumber: account.mask,
+        bankNickname: account.name,
+        value: account.balances.available,
+      })) || [];
+
+    const total = cashAccountsList.reduce(
+      (sum, account) => sum + account.value,
+      0
+    );
+    setTotalCashBalance(total);
+    setCashAccounts(cashAccountsList);
+  };
 
   if (loading) {
     return (
@@ -43,29 +140,6 @@ const DashboardPage = () => {
       </Center>
     );
   }
-  // Hardcoded values for now
-  // const projectedSavings = 5000;
-  // const targetSavings = 4000;
-  const netWorthToday = 10000;
-  const netWorthYesterday = 9000;
-  const cashAccounts = [
-    {
-      bankName: "Bank of America",
-      last4CCNumber: "8008",
-      bankNickname: "ADV SafeBalance Banking",
-      value: 10200.87,
-    },
-    {
-      bankName: "Chase Bank",
-      last4CCNumber: "6969",
-      bankNickname: "High School Checking",
-      value: 3141.59,
-    },
-  ];
-  const totalCashToday = cashAccounts.reduce(
-    (sum, account) => sum + account.value,
-    0,
-  );
 
   return (
     <VStack
@@ -76,21 +150,20 @@ const DashboardPage = () => {
     >
       <Box className={`dashboard-box-header stage${stage}`} width="full">
         <HeaderNetWorth />
-        {/* <HeaderBurnRate /> */}
       </Box>
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
-        {/* <Box className={`dashboard-box-projected-savings stage${stage}`}  width="100vw">
-          <BurnRateChange projectedSavings={projectedSavings} targetSavings={targetSavings} />
-          <BurnRateValue projectedSavings={projectedSavings} />
-          <LinechartBurnRate />
-        </Box> */}
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
           <NetWorthChange
-            netWorthYesterday={netWorthYesterday}
+            netWorthYesterday={netWorth1DaysAgo}
             netWorthToday={netWorthToday}
           />
           <NetWorthValue netWorth={netWorthToday} />
-          <LinechartNetWorth />
+          <LinechartNetWorth
+            data={netWorthData}
+            maxNetWorthDifference={maxNetWorthDifference}
+            maxNetWorth={maxNetWorth}
+            minNetWorth={minNetWorth}
+          />
         </Box>
       </Box>
       <Box
@@ -101,22 +174,22 @@ const DashboardPage = () => {
         <CashTabComponent
           accounts={cashAccounts}
           label="Cash"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Investments"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Credit Cards"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
         <CashTabComponent
           accounts={cashAccounts}
           label="Loans"
-          totalValue={totalCashToday}
+          totalValue={totalCashBalance}
         />
       </Box>
     </VStack>

@@ -67,8 +67,13 @@ export const createPlaidLinkToken = async (user_email: string) => {
         language: "en",
         country_codes: [CountryCode.Us, CountryCode.Ca],
     };
-  
+    console.log("createPlaidLinkToken REQUEST");
+    console.log(request);
+    console.log("createPlaidLinkToken REQUEST");
+    console.log("ABOUT TO CALL linkTokenCreate");
     const createTokenResponse = await client.linkTokenCreate(request);
+    console.log("FINISHED CALLING linkTokenCreate");
+    console.log("createTokenResponse was: ", createTokenResponse);
     return createTokenResponse;
 }
 
@@ -213,3 +218,19 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
         curr_sunday.setDate(curr_sunday.getDate() - 7);
     }
 }
+
+export async function fetchBankNameFromInstitutionId(institutionId: string): Promise<string> {
+    try {
+      const response = await client.institutionsGetById({
+        institution_id: institutionId,
+        country_codes: [CountryCode.Us],
+      });
+  
+      const bankName = response.data.institution.name;
+      return bankName;
+    } catch (error) {
+      console.error('Error fetching bank name for institutionId:', institutionId, error);
+      return 'Unknown Bank';
+    }
+  }
+  

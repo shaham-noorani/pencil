@@ -6,7 +6,9 @@ import { AccountBase } from "plaid";
 
 export const createLinkToken = async (req: Request, res: Response) => {
   try {
+    console.log("beginning of createLinkToken method");
     const createTokenResponse = await createPlaidLinkToken(req.body.email);
+    console.log("finished called createPlaidLinkToken method");
     res.status(200).json(createTokenResponse.data);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -29,6 +31,7 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
   }
 };
 
+// TODO: attach bank name to accounts
 export const getAccountsOverview = async (req: Request, res: Response) => {
   try {
     const user = await getUserByEmail(req.body.email);
@@ -51,6 +54,10 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
         accountsOverview[type].push(account);
       }
     };
+
+    console.log("\n\nACCOUNTS OVERVIEW RESPONSE\n\n");
+    console.log(accountsOverview);
+    console.log("\n\nACCOUNTS OVERVIEW RESPONSE\n\n");
 
     res.status(200).json(accountsOverview);
   } catch (error: any) {
