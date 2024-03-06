@@ -80,7 +80,7 @@ const BurnPage: React.FC = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum: number, account: { value: number }) => sum + account.value,
-      0
+      0,
     );
     setUserBalanceToday(totalUserCash);
 
@@ -122,7 +122,7 @@ const BurnPage: React.FC = () => {
     (balanceChanges: { [key: string]: number }) => {
       const totalBalanceChange = Object.values(balanceChanges).reduce(
         (acc, value) => acc + value,
-        0
+        0,
       );
       setUserBalanceChangeSinceAugust(totalBalanceChange);
 
@@ -141,7 +141,7 @@ const BurnPage: React.FC = () => {
     const balanceDataPoints = Object.entries(balanceChanges)
       .sort(
         ([dateA], [dateB]) =>
-          new Date(dateA).getTime() - new Date(dateB).getTime()
+          new Date(dateA).getTime() - new Date(dateB).getTime(),
       )
       .map(([date, change]) => {
         runningTotal -= change;
@@ -166,7 +166,7 @@ const BurnPage: React.FC = () => {
   const createLinechartData = (
     userBalanceDataFromAugustToToday: { date: string; value: number }[],
     projectedBalanceOnMay1: number,
-    goalSavingsOnMay1: number
+    goalSavingsOnMay1: number,
   ) => {
     const today = new Date().toLocaleDateString("en-US");
 
@@ -191,7 +191,7 @@ const BurnPage: React.FC = () => {
     });
 
     const balanceValues = userBalanceDataFromAugustToToday.map(
-      (data) => data.value
+      (data) => data.value,
     );
     balanceValues.push(projectedBalanceOnMay1, goalSavingsOnMay1);
 
@@ -215,7 +215,7 @@ const BurnPage: React.FC = () => {
     console.log("\n\noverviewData\n\n");
     const balanceData = await fetchAccountBalancesOverTime(
       axiosPrivate,
-      userData.id
+      userData.id,
     );
     console.log("\n\nbalanceData\n\n");
     console.log(balanceData);
@@ -227,7 +227,7 @@ const BurnPage: React.FC = () => {
         acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
         return acc;
       },
-      {}
+      {},
     );
     processAccountsOverview(overviewData);
 
@@ -241,7 +241,7 @@ const BurnPage: React.FC = () => {
     createLinechartData(
       userBalanceDataFromAugustToToday,
       projectedUserBalanceInMay,
-      goalSavings
+      goalSavings,
     );
   }, [me, navigate, axiosPrivate]);
 

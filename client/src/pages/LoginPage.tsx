@@ -21,7 +21,7 @@ const LoginPage = () => {
         return () => clearTimeout(stage2Timeout); // Clean up timeout when component unmounts or updates
       }, 1500); // Delay for stage 1 to stage 2
 
-      return () => clearTimeout(stage1Timeout); 
+      return () => clearTimeout(stage1Timeout);
     }, 2000);
 
     return () => clearTimeout(initialTimeout);

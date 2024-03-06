@@ -57,7 +57,7 @@ const DashboardPage = () => {
   const fetchUserNetWorthData = async (user: any) => {
     try {
       const { data } = await axiosPrivate.get(
-        `/netWorth/user/last7/${user.id}`
+        `/netWorth/user/last7/${user.id}`,
       );
       processUserNetWorths(data);
     } catch (error) {
@@ -108,7 +108,7 @@ const DashboardPage = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum: number, account: { value: number }) => sum + account.value,
-      0
+      0,
     );
     setTotalCashBalance(totalUserCash);
     setCashAccounts(cashAccountsList);

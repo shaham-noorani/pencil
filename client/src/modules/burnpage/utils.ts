@@ -2,7 +2,7 @@ import { differenceInCalendarMonths } from "date-fns";
 import { schoolEndDate, today } from "../../utils/constants";
 
 export const remainingDaysUntilSchoolEnd = Math.ceil(
-  (schoolEndDate.getTime() - today) / (1000 * 60 * 60 * 24)
+  (schoolEndDate.getTime() - today) / (1000 * 60 * 60 * 24),
 );
 
 export const monthsFromTodayToMay =
@@ -11,5 +11,5 @@ export const monthsFromTodayToMay =
 export const startOfMonth = new Date(
   new Date().getFullYear(),
   new Date().getMonth(),
-  1
+  1,
 );
