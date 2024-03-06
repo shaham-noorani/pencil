@@ -23,13 +23,9 @@ const DashboardPage = () => {
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
   const [totalCashBalance, setTotalCashBalance] = useState<number>(0);
-  const [netWorthToday, setNetWorthToday] = useState<number>(0);
-  const [netWorth1DaysAgo, setNetWorth1DaysAgo] = useState<number>(0);
-  const [netWorth2DaysAgo, setNetWorth2DaysAgo] = useState<number>(0);
-  const [netWorth3DaysAgo, setNetWorth3DaysAgo] = useState<number>(0);
-  const [netWorth4DaysAgo, setNetWorth4DaysAgo] = useState<number>(0);
-  const [netWorth5DaysAgo, setNetWorth5DaysAgo] = useState<number>(0);
-  const [netWorth6DaysAgo, setNetWorth6DaysAgo] = useState<number>(0);
+  const [netWorthForLast7Days, setNetWorthForLast7Days] = useState<number[]>([
+    0, 0, 0, 0, 0, 0, 0,
+  ]);
   const [maxNetWorth, setMaxNetWorth] = useState<number>(0);
   const [minNetWorth, setMinNetWorth] = useState<number>(0);
   const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
@@ -70,15 +66,7 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    const netWorthValues = [
-      netWorth6DaysAgo,
-      netWorth5DaysAgo,
-      netWorth4DaysAgo,
-      netWorth3DaysAgo,
-      netWorth2DaysAgo,
-      netWorth1DaysAgo,
-      netWorthToday,
-    ];
+    const netWorthValues = netWorthForLast7Days;
     const dayLabels = getDayLabels();
 
     const netWorthData = dayLabels.map((label, index) => ({
@@ -86,29 +74,23 @@ const DashboardPage = () => {
       value: netWorthValues[index],
     }));
     setNetWorthData(netWorthData);
-  }, [
-    netWorthToday,
-    netWorth1DaysAgo,
-    netWorth2DaysAgo,
-    netWorth3DaysAgo,
-    netWorth4DaysAgo,
-    netWorth5DaysAgo,
-    netWorth6DaysAgo,
-  ]);
+  }, [netWorthForLast7Days]);
 
   const processUserNetWorths = (netWorths: NetWorthEntry[]) => {
-    const netWorthValues = netWorths.map((nw) => nw.amount);
+    const netWorthValues = netWorths.map((nw) => nw.amount).reverse();
     const maxNetWorth = Math.max(...netWorthValues);
     const minNetWorth = Math.min(...netWorthValues);
     const maxNetWorthDifference = maxNetWorth - minNetWorth;
 
-    setNetWorthToday(netWorthValues[0] ?? 0);
-    setNetWorth1DaysAgo(netWorthValues[1] ?? 0);
-    setNetWorth2DaysAgo(netWorthValues[2] ?? 0);
-    setNetWorth3DaysAgo(netWorthValues[3] ?? 0);
-    setNetWorth4DaysAgo(netWorthValues[4] ?? 0);
-    setNetWorth5DaysAgo(netWorthValues[5] ?? 0);
-    setNetWorth6DaysAgo(netWorthValues[6] ?? 0);
+    // Fill in missing days with 0 if there are less than 7 days
+    if (netWorthValues.length < 7) {
+      for (let i = 0; i < 7; i++) {
+        if (i > netWorthValues.length - 1) {
+          netWorthValues.unshift(0);
+        }
+      }
+    }
+    setNetWorthForLast7Days(netWorthValues);
 
     setMaxNetWorth(maxNetWorth);
     setMinNetWorth(minNetWorth);
@@ -153,10 +135,10 @@ const DashboardPage = () => {
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
           <NetWorthChange
-            netWorthYesterday={netWorth1DaysAgo}
-            netWorthToday={netWorthToday}
+            netWorthYesterday={netWorthForLast7Days[5]}
+            netWorthToday={netWorthForLast7Days[6]}
           />
-          <NetWorthValue netWorth={netWorthToday} />
+          <NetWorthValue netWorth={netWorthForLast7Days[6]} />
           <LinechartNetWorth
             data={netWorthData}
             maxNetWorthDifference={maxNetWorthDifference}
