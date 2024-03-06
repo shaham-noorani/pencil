@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getUserByEmail } from "../services/user.service";
 import { createPlaidItem, getPlaidItemsByUserId } from "../services/plaidItem.service";
-import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust, getInstitutionIdForPlaidToken, getInstitutionNameForPlaidToken } from "../services/plaid.service";
+import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust, getInstitutionNameForPlaidToken } from "../services/plaid.service";
 import { AccountBase } from "plaid";
 import PlaidAccount from "../models/plaidAccount.model";
 

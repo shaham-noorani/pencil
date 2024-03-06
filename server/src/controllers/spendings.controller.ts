@@ -52,7 +52,7 @@ export const getSpendingsByUserIdAndDateRange = async (req: Request, res: Respon
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE user_id = $1 AND end_date >= $2 AND start_date <= $3 ORDER BY start_date",
-      [req.params.user_id, req.body.start_date, req.body.end_date],
+      [req.params.user_id, req.query.start_date, req.query.end_date],
     );
     const spent = result.rows;
 
@@ -64,7 +64,7 @@ export const getSpendingsByUserIdAndDateRange = async (req: Request, res: Respon
   } catch (error: any){
     res.status(500).json({message: error.message});
   }
-}
+};
 
 //Delete Spendings
 export const deleteSpendings = async (req: Request, res: Response) => {
