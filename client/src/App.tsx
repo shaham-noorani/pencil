@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import BurnPage from "./pages/BurnPage";
 import BurnRateGoal from "./pages/BurnRateGoalPage";
 import ConnectAccountPage from "./pages/ConnectAccountPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/burn" element={<BurnPage />} />
                 <Route path="/burn-rate-goal" element={<BurnRateGoal />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route
                   path="/connect-account"
                   element={<ConnectAccountPage />}

@@ -1,5 +1,5 @@
 import { Box, Flex, IconButton } from "@chakra-ui/react";
-import { FiHome, FiTrendingUp } from "react-icons/fi";
+import { FiHome, FiTrendingUp, FiBarChart } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
@@ -18,6 +18,14 @@ const Navbar: React.FC = () => {
           <IconButton
             aria-label="Burn"
             icon={<FiTrendingUp />}
+            colorScheme="white"
+            size="lg"
+          />
+        </Link>
+        <Link to="/analytics">
+          <IconButton
+            aria-label="Analytics"
+            icon={<FiBarChart />}
             colorScheme="white"
             size="lg"
           />
