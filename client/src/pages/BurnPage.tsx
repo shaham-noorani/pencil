@@ -10,7 +10,7 @@ import useMe from "../modules/auth/useMe";
 import useUser from "../hooks/useUser";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-import { Box, Center, Spinner, VStack } from "@chakra-ui/react";
+import { Box, Center, Flex, Spinner, VStack } from "@chakra-ui/react";
 
 import BurnRateHeader from "../modules/burnpage/BurnRateHeader";
 import BurnRateOnTrack from "../modules/burnpage/BurnRateOnTrack";
@@ -80,7 +80,7 @@ const BurnPage: React.FC = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum: number, account: { value: number }) => sum + account.value,
-      0,
+      0
     );
     setUserBalanceToday(totalUserCash);
 
@@ -122,7 +122,7 @@ const BurnPage: React.FC = () => {
     (balanceChanges: { [key: string]: number }) => {
       const totalBalanceChange = Object.values(balanceChanges).reduce(
         (acc, value) => acc + value,
-        0,
+        0
       );
       setUserBalanceChangeSinceAugust(totalBalanceChange);
 
@@ -141,7 +141,7 @@ const BurnPage: React.FC = () => {
     const balanceDataPoints = Object.entries(balanceChanges)
       .sort(
         ([dateA], [dateB]) =>
-          new Date(dateA).getTime() - new Date(dateB).getTime(),
+          new Date(dateA).getTime() - new Date(dateB).getTime()
       )
       .map(([date, change]) => {
         runningTotal -= change;
@@ -166,7 +166,7 @@ const BurnPage: React.FC = () => {
   const createLinechartData = (
     userBalanceDataFromAugustToToday: { date: string; value: number }[],
     projectedBalanceOnMay1: number,
-    goalSavingsOnMay1: number,
+    goalSavingsOnMay1: number
   ) => {
     const today = new Date().toLocaleDateString("en-US");
 
@@ -191,7 +191,7 @@ const BurnPage: React.FC = () => {
     });
 
     const balanceValues = userBalanceDataFromAugustToToday.map(
-      (data) => data.value,
+      (data) => data.value
     );
     balanceValues.push(projectedBalanceOnMay1, goalSavingsOnMay1);
 
@@ -215,7 +215,7 @@ const BurnPage: React.FC = () => {
     console.log("\n\noverviewData\n\n");
     const balanceData = await fetchAccountBalancesOverTime(
       axiosPrivate,
-      userData.id,
+      userData.id
     );
     console.log("\n\nbalanceData\n\n");
     console.log(balanceData);
@@ -227,7 +227,7 @@ const BurnPage: React.FC = () => {
         acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
         return acc;
       },
-      {},
+      {}
     );
     processAccountsOverview(overviewData);
 
@@ -241,7 +241,7 @@ const BurnPage: React.FC = () => {
     createLinechartData(
       userBalanceDataFromAugustToToday,
       projectedUserBalanceInMay,
-      goalSavings,
+      goalSavings
     );
   }, [me, navigate, axiosPrivate]);
 
@@ -265,10 +265,17 @@ const BurnPage: React.FC = () => {
         bg="#222222"
         justifyContent="flex-start"
       >
-        <Box className={`burn-rate-header`} width="full">
+        <Flex className={`burn-rate-header`} width="full">
           <BurnRateHeader />
-        </Box>
-        <Box className={`burn-rate-middle`} width="full" bg="black" py={3}>
+        </Flex>
+        <Box
+          className={`burn-rate-middle`}
+          borderRadius="lg"
+          padding={4}
+          mx={5}
+          w={"93%"}
+          bg="black"
+        >
           <BurnRateOnTrack
             projectedSavings={projectedUserBalanceInMay}
             goalSavings={goalSavings}
