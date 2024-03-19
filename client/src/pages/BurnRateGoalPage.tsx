@@ -13,9 +13,12 @@ function BurnRateGoal() {
   const [burn_rate_goal, setBurnRateGoal] = useState<number>(0);
   const [showSubmit, setShowSubmit] = useState<boolean>(false);
 
+  const [showCancelButton, setShowCancelButton] = useState<boolean>(false);
+
   useEffect(() => {
     if (user.burn_rate_goal !== null) {
-      navigate("/burn");
+      setBurnRateGoal(user.burn_rate_goal);
+      setShowCancelButton(true);
     }
   }, [user]);
 
@@ -67,11 +70,22 @@ function BurnRateGoal() {
             textColor={"black"}
             w={"100%"}
             onClick={() => updateUser()}
-            mt={"60vh"}
-            isDisabled={burn_rate_goal === 0}
+            mt={showCancelButton ? "52vh" : "60vh"}
+            isDisabled={burn_rate_goal < 0}
           >
             Submit
           </Button>
+          {showCancelButton && (
+            <Button
+              bg={"red.500"}
+              textColor={"black"}
+              w={"100%"}
+              mt={4}
+              onClick={() => navigate("/burn")}
+            >
+              Cancel
+            </Button>
+          )}
         </Box>
       )}
     </>
