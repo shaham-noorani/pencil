@@ -71,7 +71,7 @@ function BurnRateGoal() {
             w={"100%"}
             onClick={() => updateUser()}
             mt={showCancelButton ? "52vh" : "60vh"}
-            isDisabled={burn_rate_goal === 0}
+            isDisabled={burn_rate_goal < 0}
           >
             Submit
           </Button>
