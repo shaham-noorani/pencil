@@ -1,13 +1,21 @@
 import { pool } from "../db";
 import PlaidItem from "../models/user.model";
 
-export const createPlaidItem = async (token: string, synch_token: string|null, user_id: number) => {
+export const createPlaidItem = async (token: string, user_id: number, synch_token: string|null) => {
   const result = await pool.query(
     "INSERT INTO plaid_item (token, synch_token, user_id) VALUES ($1, $2, $3) RETURNING *",
     [token, synch_token, user_id]
   );
   const item = result.rows[0];
   return item;
+};
+
+export const updatePlaidItemSynchToken = async (user_id: number, synch_token: string|null) => {
+  const update_plaid_item = await pool.query(
+    "UPDATE plaid_item SET synch_token = $1 WHERE id = $2 RETURNING *",
+    [synch_token, user_id]
+  );
+  return update_plaid_item;
 };
 
 export const getPlaidItemsByUserId = async(user_id: number) => {
