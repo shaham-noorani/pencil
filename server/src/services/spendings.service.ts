@@ -24,6 +24,8 @@ export const createOrUpdateSpending = async (
     [new_amount, curr_id]
   );
 
+  return update_spend.rows[0];
+
 }
 
 
