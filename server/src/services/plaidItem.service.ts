@@ -1,10 +1,10 @@
 import { pool } from "../db";
 import PlaidItem from "../models/user.model";
 
-export const createPlaidItem = async (token: string, user_id: number) => {
+export const createPlaidItem = async (token: string, synch_token: string|null, user_id: number) => {
   const result = await pool.query(
-    "INSERT INTO plaid_item (token, user_id) VALUES ($1, $2) RETURNING *",
-    [token, user_id]
+    "INSERT INTO plaid_item (token, synch_token, user_id) VALUES ($1, $2, $3) RETURNING *",
+    [token, synch_token, user_id]
   );
   const item = result.rows[0];
   return item;

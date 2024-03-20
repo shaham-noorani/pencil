@@ -12,7 +12,7 @@ export const createOrUpdateSpending = async (
   );
 
   //If found nothing, this must be the first account added for this user
-  if (curr_amount.rows.length == 0){
+  if (curr_amount.rows.length === 0){
     return createSpendings(spending);
   }
 
