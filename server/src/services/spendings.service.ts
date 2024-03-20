@@ -15,9 +15,9 @@ export const addSpendings = async (
   const curr_id = curr_amount.rows[0]["id"];
   let new_amount = curr_amount.rows[0]["spent_amount"] + spending.spent_amount;
 
-  const update_lr = await pool.query(
+  const update_spend = await pool.query(
     "UPDATE user_spendings SET spent_amount = $1 WHERE id = $2 RETURNING *",
-    [curr_amount, curr_id]
+    [new_amount, curr_id]
   );
 
 }
