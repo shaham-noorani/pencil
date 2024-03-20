@@ -2,8 +2,7 @@ import { updateExample } from "../controllers/example.controller";
 import { pool } from "../db";
 import Spendings from "../models/spendings.model";
 
-
-export const addSpendings = async (
+export const createOrUpdateSpending = async (
   spending: Spendings
 ): Promise<Spendings> => {
 
@@ -11,6 +10,11 @@ export const addSpendings = async (
     "SELECT spent_amount,id FROM user_spendings WHERE user_id = $1, start_date = $2, end_date = $3, ",
     [spending.user_id, spending.start_date, spending.end_date]
   );
+
+  //If found nothing, this must be the first account added for this user
+  if (curr_amount.rows.length == 0){
+    return createSpendings(spending);
+  }
 
   const curr_id = curr_amount.rows[0]["id"];
   let new_amount = curr_amount.rows[0]["spent_amount"] + spending.spent_amount;
