@@ -2,6 +2,27 @@ import { updateExample } from "../controllers/example.controller";
 import { pool } from "../db";
 import Spendings from "../models/spendings.model";
 
+
+export const addSpendings = async (
+  spending: Spendings
+): Promise<Spendings> => {
+
+  const curr_amount = await pool.query(
+    "SELECT spent_amount,id FROM user_spendings WHERE user_id = $1, start_date = $2, end_date = $3, ",
+    [spending.user_id, spending.start_date, spending.end_date]
+  );
+
+  const curr_id = curr_amount.rows[0]["id"];
+  let new_amount = curr_amount.rows[0]["spent_amount"] + spending.spent_amount;
+
+  const update_lr = await pool.query(
+    "UPDATE user_spendings SET spent_amount = $1 WHERE id = $2 RETURNING *",
+    [curr_amount, curr_id]
+  );
+
+}
+
+
 //Create Spendings
 export const createSpendings = async (
   spending: Spendings
