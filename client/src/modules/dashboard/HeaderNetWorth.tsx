@@ -1,11 +1,10 @@
-import { Button, Flex, Text } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import { Flex, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import PlaidLink from "../auth/PlaidLink";
+
 
 const HeaderNetWorth = () => {
   const today = format(new Date(), "EEEE, MMMM do");
-  const navigate = useNavigate();
 
   return (
     <Flex
@@ -21,12 +20,7 @@ const HeaderNetWorth = () => {
         <Text fontSize="3xl" fontWeight="bold">
           Home
         </Text>
-        <Button
-          leftIcon={<AddIcon color="white" />}
-          onClick={() => navigate("/connect-account")}
-          fontSize={"sm"}
-          bg="#222222"
-        />
+        <PlaidLink type="connect-another-account"/>
       </Flex>
       <Text fontSize="md">{today}</Text>
     </Flex>
