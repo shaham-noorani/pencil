@@ -11,7 +11,7 @@ import {
     RemovedTransaction,
     TransactionsSyncRequest,
   } from "plaid";
-import { buildLinearRegression, createSpendings } from "./spendings.service";
+import { buildLinearRegression, createSpendings, createOrUpdateSpending } from "./spendings.service";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -216,7 +216,7 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
         next_sunday.setDate(next_sunday.getDate() + 7);
         next_sunday.setTime(next_sunday.getTime() - 1);
         
-        const spending = await createSpendings({
+        const spending = await createOrUpdateSpending({
             id: 0,
             start_date: new Date(curr_sunday),
             end_date: new Date(next_sunday),
