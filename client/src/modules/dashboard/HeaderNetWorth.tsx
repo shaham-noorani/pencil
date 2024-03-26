@@ -1,5 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
+import PlaidLink from "../auth/PlaidLink";
+
 
 const HeaderNetWorth = () => {
   const today = format(new Date(), "EEEE, MMMM do");
@@ -14,9 +16,12 @@ const HeaderNetWorth = () => {
       alignItems="flex-start"
       marginTop="5%"
     >
-      <Text fontSize="3xl" fontWeight="bold">
-        Home
-      </Text>
+      <Flex w="full" justifyContent="space-between" alignItems="center">
+        <Text fontSize="3xl" fontWeight="bold">
+          Home
+        </Text>
+        <PlaidLink type="connect-another-account"/>
+      </Flex>
       <Text fontSize="md">{today}</Text>
     </Flex>
   );
