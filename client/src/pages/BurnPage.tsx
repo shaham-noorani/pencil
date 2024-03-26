@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
 import LineChartData from "../models/burnpageLinechartData.model";
 
-import { schoolEndDate, today } from "../utils/constants";
+import { schoolEndDate } from "../utils/constants";
 
 import useMe from "../modules/auth/useMe";
 import useUser from "../hooks/useUser";
@@ -36,17 +35,6 @@ const BurnPage: React.FC = () => {
 
   // User-related state variables
   const [loading, setLoading] = useState(true);
-  const [pageData, setPageData] = useState({
-    userBalanceToday: 0,
-    amountSpentThisMonth: 0,
-    userBalanceAtStartOfMonth: 0,
-    monthlyBudget: 0,
-    remainingBudget: 0,
-    linechartData: [],
-    minBalanceData: 0,
-    maxBalanceData: 0,
-    maxDataDifference: 0,
-  });
   const [userBalanceToday, setUserBalanceToday] = useState<number>(0);
   const [userBalanceChangeSinceAugust, setUserBalanceChangeSinceAugust] =
     useState<number>(0);
@@ -79,6 +67,7 @@ const BurnPage: React.FC = () => {
   const projectedUserSpendingPerDay = (user?.slope ?? 0) / 7;
 
   // TODO: clean this up
+  // Helper Functions
   const processAllData = (
     overviewData: AccountsOverview,
     balanceData: any,
@@ -97,7 +86,7 @@ const BurnPage: React.FC = () => {
       0
     );
     const projectedSavingsInMay =
-      totalUserCash + ((user?.slope ?? 0) / 7) * remainingDaysUntilSchoolEnd;
+      totalUserCash + (projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd);
 
     const transformedBalanceChanges = balanceData.reduce(
       (acc: any, curr: any) => {
@@ -198,7 +187,6 @@ const BurnPage: React.FC = () => {
     const maxBalanceData = Math.max(...balanceValues);
     const maxDataDifference = maxBalanceData - minBalanceData;
 
-    // Return both the line chart data and the min/max balance data for chart scaling
     return {
       lineChartData: updatedLineChartData,
       minBalanceData,
@@ -232,7 +220,6 @@ const BurnPage: React.FC = () => {
     setUserBalanceInAugust(userBalanceInAugustCalculation);
     setUserBalanceDataFromAugustToToday(userBalanceDataPointsFromAugustToToday);
 
-
     const {lineChartData, minBalanceData, maxBalanceData, maxDataDifference} = prepareLinechartData(
       userBalanceDataPointsFromAugustToToday,
       projectedSavingsInMay,
@@ -244,7 +231,6 @@ const BurnPage: React.FC = () => {
     setLinechartData(lineChartData);
   };
 
-  // Helper Functions
   const loadData = async () => {
     setLoading(true);
     try {
@@ -255,20 +241,11 @@ const BurnPage: React.FC = () => {
       }
 
       const overviewData = await fetchAccountsOverview(axiosPrivate);
-      console.log("\n\noverviewData\n\n");
-      console.log(overviewData);
-      console.log("\n\noverviewData\n\n");
       const balanceData = await fetchAccountBalancesOverTime(
         axiosPrivate,
         userData.id
       );
-      console.log("\n\nbalanceData\n\n");
-      console.log(balanceData);
-      console.log("\n\nbalanceData\n\n");
-      // Process data
-      const processedData = processAllData(overviewData, balanceData, me); // Assume this function processes all your data and returns an object with all the state you need to update
-
-      // Update all relevant states here at once
+      const processedData = processAllData(overviewData, balanceData, me);
       updateAllStates(processedData);
     } catch (error) {
       console.error("error loading data: ", error);
@@ -277,11 +254,9 @@ const BurnPage: React.FC = () => {
     }
   };
 
-  // useEffect for loading data before page renders
+  // useEffect for loading data
   useEffect(() => {
     loadData().finally(() => setLoading(false));
-    // loadData();
-    // setLoading(false);
   }, []);
 
   if (loading) {
