@@ -10,7 +10,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
 import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
-import { getDayLabels } from "../utils/getDayLabels"; // Assume this is a utility function you've created
+import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
 
@@ -31,19 +31,29 @@ const DashboardPage = () => {
   const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
   const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
+
   useEffect(() => {
-    me().then((user) => {
-      axiosPrivate
-        .get(`/plaidItem/user/${user.id}`)
-        .catch(() => {
-          navigate("/connect-account");
-        })
-        .then(() => {
-          fetchAccountsOverview();
-          fetchUserNetWorthData(user);
-          setLoading(false);
-        });
-    });
+    const loadData = async () => {
+      try {
+        const user = await me();
+        // Attempt to get the Plaid item for the user
+        await axiosPrivate.get(`/plaidItem/user/${user.id}`);
+  
+        // If successful, proceed with fetching account overview and net worth data
+        await Promise.all([
+          fetchAccountsOverview(),
+          fetchUserNetWorthData(user)
+        ]);
+  
+      } catch (error) {
+        console.error("Error fetching users plaid item entry: ", error);
+        navigate("/connect-account");
+        return;
+      }
+      setLoading(false);
+    };
+  
+    loadData();
   }, []);
 
   const fetchAccountsOverview = async () => {
