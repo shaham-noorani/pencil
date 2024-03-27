@@ -44,13 +44,16 @@ def create_transactions(starting_amount, avg_daily_spend, std_daily_spend, add_r
   #   spendings[i] = spendings[i-1] - spendings[i]
 
 
-  spendings = np.clip(spendings, 0, np.inf)
 
   if filename:
     temp = json.loads(open("template.json", "r").read())
     n = len(spendings)
     for i, (start, spent) in enumerate(zip(start_dates, spendings)):
       #print(f"Complete {i/n*100:.2f}%...", end="\r")
+      spent = round(spent, 2)
+      if spent == 0:
+        continue
+
       entry ={
         "date_transacted": str(start).split(" ")[0],
         "date_posted": str(start).split(" ")[0],
