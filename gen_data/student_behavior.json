@@ -1,0 +1,17 @@
+{
+    "starting_amount": 2000,
+    "avg_daily_spend": 15.71,
+    "std_daily_spend": 7.5,
+    "add_reoccuring_pay": [
+        -120
+    ],
+    "freq_of_pay": [
+        2
+    ],
+    "avg_rand_add_pay": 250,
+    "std_rand_add_pay": 75,
+    "rand_add_pay_occur": 2,
+    "avg_rand_income": 100,
+    "std_rand_income": 50,
+    "rand_income_occur": 5
+}
