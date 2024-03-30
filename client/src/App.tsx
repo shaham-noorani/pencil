@@ -15,7 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/plaid" element={<PlaidLink />} />
+          <Route path="/plaid" element={<PlaidLink type="connect-first-account"/>} />
           <Route element={<PersistAuth />}>
             <Route element={<RequireAuth />}>
               <Route element={<Layout />}>

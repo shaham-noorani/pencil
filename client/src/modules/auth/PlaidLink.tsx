@@ -6,11 +6,16 @@ import { usePlaidLink } from "react-plaid-link";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Button } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
 
 // LINK COMPONENT
 // Use Plaid Link and pass link token and onSuccess function
 // in configuration to initialize Plaid Link
-const PlaidLink = () => {
+interface PlaidLinkProps {
+  type: string;
+}
+
+const PlaidLink = ({ type }: PlaidLinkProps) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
 
@@ -36,10 +41,23 @@ const PlaidLink = () => {
     onSuccess,
   };
   const { open, ready } = usePlaidLink(config);
-  return (
-    <Button width="100%" onClick={() => open()} disabled={!ready}>
-      Link account
-    </Button>
-  );
+
+  if (type === "connect-first-account") {
+    return (
+      <Button width="100%" onClick={() => open()} disabled={!ready}>
+        Link account
+      </Button>
+    );
+  } else {
+    return (
+      <Button
+        leftIcon={<AddIcon color="white" />}
+        onClick={() => open()}
+        disabled={!ready}
+        fontSize={"sm"}
+        bg="#222222"
+      />
+    );
+  }
 };
 export default PlaidLink;
