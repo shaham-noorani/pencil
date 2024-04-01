@@ -1,7 +1,19 @@
 import { Request, Response } from "express";
 import { getUserByEmail } from "../services/user.service";
-import { createPlaidItem, getPlaidItemsByUserId } from "../services/plaidItem.service";
-import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust, getInstitutionNameForPlaidToken } from "../services/plaid.service";
+import {
+  createPlaidItem,
+  getPlaidItemsByUserId,
+} from "../services/plaidItem.service";
+import {
+  createPlaidLinkToken,
+  exchangePlaidPublicTokenForAccessToken,
+  getAccountsForPlaidToken,
+  getSyncedTransactions,
+  addTransactionArrayToSpendings,
+  getTransactionsWithinDateRange,
+  getMostRecentAugust,
+  getInstitutionNameForPlaidToken,
+} from "../services/plaid.service";
 import { AccountBase } from "plaid";
 import PlaidAccount from "../models/plaidAccount.model";
 
@@ -19,8 +31,14 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
   try {
     const user = await getUserByEmail(req.body.email);
     const public_token = req.body.public_token;
-    const access_token = await exchangePlaidPublicTokenForAccessToken(public_token);
-    const createPlaidItemResponse = await createPlaidItem(access_token, user.id);
+    const access_token = await exchangePlaidPublicTokenForAccessToken(
+      public_token
+    );
+    const createPlaidItemResponse = await createPlaidItem(
+      access_token,
+      user.id,
+      null
+    );
 
     //const transactions = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
     const transactions = await getSyncedTransactions(access_token, "");
@@ -36,14 +54,16 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
     const user = await getUserByEmail(req.body.email);
     let plaid_items = await getPlaidItemsByUserId(user.id);
     if (!plaid_items) {
-      plaid_items = []
+      plaid_items = [];
     }
-    
+
     const accountsOverview: { [key: string]: PlaidAccount[] } = {};
 
     for (const plaid_item of plaid_items) {
       const accounts = await getAccountsForPlaidToken(plaid_item.token);
-      const institution_name = await getInstitutionNameForPlaidToken(plaid_item.token);
+      const institution_name = await getInstitutionNameForPlaidToken(
+        plaid_item.token
+      );
 
       for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i] as PlaidAccount;
@@ -51,14 +71,14 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
         if (institution_name) {
           account.institution_name = institution_name;
         }
-        
+
         const type: string = account.type;
         if (!(type in accountsOverview)) {
           accountsOverview[type] = [];
         }
         accountsOverview[type].push(account);
       }
-    };
+    }
 
     res.status(200).json(accountsOverview);
   } catch (error: any) {

@@ -36,9 +36,9 @@
                 ]
             }
         },
-        {
-            "transactions": []
-        },
+        {"transactions": [
+            
+        ]},
         {
             "type": "loan",
             "subtype": "student",

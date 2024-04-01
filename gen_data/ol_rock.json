@@ -34,9 +34,7 @@
                         }
                     }
                 ]
-            }
-        },
-        {
+            },
             "transactions": [
                 {
                     "date_transacted": "2023-08-01",

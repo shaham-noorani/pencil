@@ -83,6 +83,7 @@ def create_transactions(starting_amount, avg_daily_spend, std_daily_spend, add_r
       plt.show()
 
 
+
     plot(start_dates,spendings)
 
 

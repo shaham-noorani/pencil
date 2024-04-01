@@ -4,6 +4,7 @@ import {
   createSpendings,
   buildLinearRegression,
 } from "../services/spendings.service";
+import { getAccountsOverviewService } from "../services/plaid.service";
 
 //Get PlaidItems
 export const getAllSpendings = async (req: Request, res: Response) => {
@@ -138,7 +139,14 @@ export const getFunBudget = async (req: Request, res: Response) => {
     diff = Math.ceil(diff / milliseconds_to_days);
 
     //Get current amount
-    let curr_amount = 10000; //FIX
+    let acct_ov = await getAccountsOverviewService(Number(req.params.user_id));
+    let curr_amount = 0;
+
+    for (let acc of acct_ov["depository"]) {
+      let amt = acc.balances.current;
+      curr_amount += amt!;
+    }
+
     let starting_amount = curr_amount;
     let last_month = curr_amount;
 
@@ -151,7 +159,7 @@ export const getFunBudget = async (req: Request, res: Response) => {
 
     for (let i = 0; i < spent.length; i++) {
       starting_amount += spent[i]["spent_amount"];
-      if (new Date(spent[i]["end_date"]).getMonth() == month) {
+      if (new Date(spent[i]["end_date"]).getMonth() == month - 1) {
         last_month += spent[i]["spent_amount"];
       }
     }

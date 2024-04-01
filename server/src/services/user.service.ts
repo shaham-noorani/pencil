@@ -11,7 +11,7 @@ export const createUser = async (user: User): Promise<User> => {
       user.slope,
       user.intercept,
       new Date(),
-    ],
+    ]
   );
 
   return req.rows[0];
@@ -21,6 +21,14 @@ export const getUserByEmail = async (email: string) => {
   const user = await pool.query("SELECT * FROM users WHERE email = $1", [
     email,
   ]);
+
+  if (user.rows.length === 0) return null;
+
+  return user.rows[0];
+};
+
+export const getUserByIdService = async (id: number) => {
+  const user = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
 
   if (user.rows.length === 0) return null;
 
