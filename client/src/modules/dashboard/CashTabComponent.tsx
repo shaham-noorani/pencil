@@ -31,7 +31,7 @@ const CashTabComponent = ({
   const handleToggle = () => setIsOpen(!isOpen);
 
   return (
-    <VStack align="stretch" spacing={4} pb="10px">
+    <VStack align="stretch" spacing={1} pb="10px">
       <Flex
         justifyContent="space-between"
         p={4}
@@ -62,9 +62,9 @@ const CashTabComponent = ({
         </Flex>
       </Flex>
       <Collapse in={isOpen}>
-        <VStack p={4} spacing={4} align="stretch">
+        <VStack px={1} align="stretch">
           {accounts.map((account, index) => (
-            <Box key={index} p={3} bg="gray.600" borderRadius="md">
+            <Box key={index} p={3} bg="#151515" borderRadius="md">
               <Text color="white">
                 {account.bankNickname} - ${account.value.toLocaleString()}
               </Text>
