@@ -31,20 +31,18 @@ const DashboardPage = () => {
   const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
   const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
-
   useEffect(() => {
     const loadData = async () => {
       try {
         const user = await me();
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
-  
+
         // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
           fetchAccountsOverview(),
-          fetchUserNetWorthData(user)
+          fetchUserNetWorthData(user),
         ]);
-  
       } catch (error) {
         console.error("Error fetching users plaid item entry: ", error);
         navigate("/connect-account");
@@ -52,7 +50,7 @@ const DashboardPage = () => {
       }
       setLoading(false);
     };
-  
+
     loadData();
   }, []);
 
