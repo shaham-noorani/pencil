@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserByEmail } from "../services/user.service";
+import { getUserByEmail, getUserByIdService } from "../services/user.service";
 import {
   createPlaidItem,
   getPlaidItemsByUserId,
@@ -34,16 +34,11 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
     const access_token = await exchangePlaidPublicTokenForAccessToken(
       public_token
     );
-<<<<<<< HEAD
     const createPlaidItemResponse = await createPlaidItem(
       access_token,
       user.id,
       null
     );
-=======
-    // const createPlaidItemResponse = await createPlaidItem(access_token, user.id);
-    // Why is this throwing an error?
->>>>>>> origin/main
 
     //const transactions = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
     const transactions = await getSyncedTransactions(access_token, "");
@@ -89,4 +84,37 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
+};
+
+export const getAccountsOverviewService = async (id: number) => {
+  const user = await getUserByIdService(id);
+  let plaid_items = await getPlaidItemsByUserId(id);
+  if (!plaid_items) {
+    plaid_items = [];
+  }
+
+  const accountsOverview: { [key: string]: PlaidAccount[] } = {};
+
+  for (const plaid_item of plaid_items) {
+    const accounts = await getAccountsForPlaidToken(plaid_item.token);
+    const institution_name = await getInstitutionNameForPlaidToken(
+      plaid_item.token
+    );
+
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i] as PlaidAccount;
+
+      if (institution_name) {
+        account.institution_name = institution_name;
+      }
+
+      const type: string = account.type;
+      if (!(type in accountsOverview)) {
+        accountsOverview[type] = [];
+      }
+      accountsOverview[type].push(account);
+    }
+  }
+
+  return accountsOverview;
 };
