@@ -31,20 +31,18 @@ const DashboardPage = () => {
   const [maxNetWorthDifference, setMaxNetWorthDifference] = useState<number>(0);
   const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
-
   useEffect(() => {
     const loadData = async () => {
       try {
         const user = await me();
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
-  
+
         // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
           fetchAccountsOverview(),
-          fetchUserNetWorthData(user)
+          fetchUserNetWorthData(user),
         ]);
-  
       } catch (error) {
         console.error("Error fetching users plaid item entry: ", error);
         navigate("/connect-account");
@@ -52,7 +50,7 @@ const DashboardPage = () => {
       }
       setLoading(false);
     };
-  
+
     loadData();
   }, []);
 
@@ -67,7 +65,7 @@ const DashboardPage = () => {
   const fetchUserNetWorthData = async (user: any) => {
     try {
       const { data } = await axiosPrivate.get(
-        `/netWorth/user/last7/${user.id}`,
+        `/netWorth/user/last7/${user.id}`
       );
       processUserNetWorths(data);
     } catch (error) {
@@ -118,7 +116,7 @@ const DashboardPage = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum: number, account: { value: number }) => sum + account.value,
-      0,
+      0
     );
     setTotalCashBalance(totalUserCash);
     setCashAccounts(cashAccountsList);
@@ -159,8 +157,9 @@ const DashboardPage = () => {
       </Box>
       <Box
         className={`dashboard-box-tabs stage${stage}`}
-        width="full"
+        width="98vw"
         pt="20px"
+        pb="100px"
       >
         <CashTabComponent
           accounts={cashAccounts}
