@@ -12,6 +12,7 @@ import {
     TransactionsSyncRequest,
   } from "plaid";
 import { buildLinearRegression, createSpendings, createOrUpdateSpending } from "./spendings.service";
+import { updatePlaidItemSynchToken } from "./plaidItem.service";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -155,19 +156,20 @@ export const getTransactionsWithinDateRange = async(token:string, start_date: Da
     return transactions;
 }
 
-export const getSyncedTransactions = async(token: string, cursor: string) => {
+export const getSyncedTransactions = async(token: string, user_id: number, cursor: string) => {
     let added: Array<Transaction> = [];
     let modified: Array<Transaction> = [];
     let removed: Array<RemovedTransaction> = [];
     
     let hasMore = true;
     let curr_cursor = cursor;
+
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
         const request: TransactionsSyncRequest = {
             access_token: token,
         };
-        if (cursor.length > 0) {
+        if (curr_cursor.length > 0) {
             request.cursor = curr_cursor;
         }
         const response = await client.transactionsSync(request);
@@ -180,6 +182,8 @@ export const getSyncedTransactions = async(token: string, cursor: string) => {
         // Update cursor to the next cursor
         curr_cursor = data.next_cursor;
     }
+
+    const updatedSyncTokenResponse = await updatePlaidItemSynchToken(user_id, curr_cursor);
 
     return added;
 }
