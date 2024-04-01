@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import AccountsOverviewResponse from "../models/accountsOverviewResponse.model";
 import LineChartData from "../models/burnpageLinechartData.model";
 
-import { schoolEndDate, today } from "../utils/constants";
+import { schoolEndDate } from "../utils/constants";
 
 import useMe from "../modules/auth/useMe";
 import useUser from "../hooks/useUser";
@@ -69,82 +68,60 @@ const BurnPage: React.FC = () => {
 
   // TODO: clean this up
   // Helper Functions
-  const processAccountsOverview = (data: AccountsOverview) => {
+  const processAllData = (
+    overviewData: AccountsOverview,
+    balanceData: any,
+    user: any,
+  ) => {
     const cashAccountsList =
-      data.depository?.map((account) => ({
-        bankName: account.institution_name, // Correctly using 'institution_name'
+      overviewData.depository?.map((account) => ({
+        bankName: account.institution_name,
         last4CCNumber: account.mask,
         bankNickname: account.name,
         value: account.balances.available,
       })) || [];
 
     const totalUserCash = cashAccountsList.reduce(
-      (sum: number, account: { value: number }) => sum + account.value,
-      0
+      (sum, account) => sum + account.value,
+      0,
     );
-    setUserBalanceToday(totalUserCash);
-
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
-    setProjectedUserBalanceInMay(projectedSavingsInMay);
-  };
 
-  const calculateAmountSpentThisMonth = (balanceChanges: {
-    [key: string]: number;
-  }) => {
-    const balanceChangeThisMonth = Object.entries(balanceChanges)
+    const transformedBalanceChanges = balanceData.reduce(
+      (acc: any, curr: any) => {
+        const startDateStr = new Date(curr.start_date).toLocaleDateString();
+        acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
+        return acc;
+      },
+      {},
+    );
+
+    const balanceChangeThisMonth = Object.entries(transformedBalanceChanges)
       .filter(([date]) => new Date(date) >= startOfMonth)
-      .reduce((acc, [, value]) => acc + value, 0);
-    setAmountSpentThisMonth(balanceChangeThisMonth);
-    console.log("amountSpentThisMonth");
-    console.log(amountSpentThisMonth);
-    console.log("amountSpentThisMonth");
-  };
+      .reduce((acc, [, value]) => acc + (value as number), 0);
 
-  const calculateUserBalanceAtStartOfMonth = () => {
-    const usersBalanceAtStartOfMonth = userBalanceToday - amountSpentThisMonth;
-    setUserBalanceAtStartOfMonth(usersBalanceAtStartOfMonth);
-    console.log("userBalanceAtStartOfMonth");
-    console.log(userBalanceAtStartOfMonth);
-    console.log("userBalanceAtStartOfMonth");
-  };
-
-  const calculateMonthlyAndRemainingBudget = () => {
+    const usersBalanceAtStartOfMonth = totalUserCash - balanceChangeThisMonth;
     const monthlyBudgetAmount =
-      (userBalanceAtStartOfMonth - goalSavings) / monthsFromTodayToMay;
-    setMonthlyBudget(monthlyBudgetAmount);
+      (usersBalanceAtStartOfMonth - (user?.burn_rate_goal ?? 0)) /
+      monthsFromTodayToMay;
+    const remainingBudgetThisMonth =
+      monthlyBudgetAmount - balanceChangeThisMonth;
+    const totalBalanceChange = Object.values(transformedBalanceChanges).reduce(
+      (acc, value) => (acc as number) + (value as number),
+      0,
+    );
+    const userBalanceInAugustCalculation =
+      totalUserCash - (totalBalanceChange as number);
 
-    const remainingBudgetThisMonth = monthlyBudgetAmount - amountSpentThisMonth;
-    setRemainingBudget(remainingBudgetThisMonth);
-  };
-
-  const calculateUserBalanceInAndUserBalanceChangeSinceAugust =
-    (balanceChanges: { [key: string]: number }) => {
-      const totalBalanceChange = Object.values(balanceChanges).reduce(
-        (acc, value) => acc + value,
-        0
-      );
-      setUserBalanceChangeSinceAugust(totalBalanceChange);
-
-      const userBalanceInAugustCalculation =
-        userBalanceToday - totalBalanceChange;
-      setUserBalanceInAugust(userBalanceInAugustCalculation);
-    };
-
-  const processUserBalanceDataFromAugustToToday = (balanceChanges: {
-    [key: string]: number;
-  }) => {
-    let runningTotal = userBalanceInAugust;
-    console.log("userbalanceinaugust");
-    console.log(userBalanceInAugust);
-    console.log("userbalanceinaugust");
-    const balanceDataPoints = Object.entries(balanceChanges)
+    let runningTotal = userBalanceInAugustCalculation;
+    const balanceDataPoints = Object.entries(transformedBalanceChanges)
       .sort(
         ([dateA], [dateB]) =>
-          new Date(dateA).getTime() - new Date(dateB).getTime()
+          new Date(dateA).getTime() - new Date(dateB).getTime(),
       )
       .map(([date, change]) => {
-        runningTotal -= change;
+        runningTotal -= change as number;
         return {
           date: new Date(date).toLocaleDateString(),
           value: runningTotal,
@@ -152,27 +129,37 @@ const BurnPage: React.FC = () => {
       });
 
     let userBalanceDataPointsFromAugustToToday = [
-      { date: "8/1/2023", value: userBalanceInAugust },
+      { date: "8/1/2023", value: userBalanceInAugustCalculation },
       ...balanceDataPoints,
+      {
+        date: new Date().toLocaleDateString("en-US"),
+        value: totalUserCash,
+      },
     ];
-    userBalanceDataPointsFromAugustToToday.push({
-      date: new Date(today).toLocaleDateString("en-US"),
-      value: userBalanceToday,
-    });
 
-    setUserBalanceDataFromAugustToToday(userBalanceDataPointsFromAugustToToday);
+    return {
+      totalUserCash,
+      projectedSavingsInMay,
+      transformedBalanceChanges,
+      balanceChangeThisMonth,
+      usersBalanceAtStartOfMonth,
+      monthlyBudgetAmount,
+      remainingBudgetThisMonth,
+      totalBalanceChange,
+      userBalanceInAugustCalculation,
+      userBalanceDataPointsFromAugustToToday,
+    };
   };
 
-  const createLinechartData = (
-    userBalanceDataFromAugustToToday: { date: string; value: number }[],
-    projectedBalanceOnMay1: number,
-    goalSavingsOnMay1: number
+  const prepareLinechartData = (
+    userBalanceDataFromAugustToToday: any,
+    projectedBalanceOnMay1: any,
+    goalSavingsOnMay1: any,
+    schoolEndDate: any,
   ) => {
     const today = new Date().toLocaleDateString("en-US");
-
-    const updatedLineChartData: LineChartData[] =
-      userBalanceDataFromAugustToToday.map((data) => {
-        // Check if the data's date is today
+    const updatedLineChartData = userBalanceDataFromAugustToToday.map(
+      (data: any) => {
         const isToday =
           new Date(data.date).toLocaleDateString("en-US") === today;
 
@@ -182,7 +169,9 @@ const BurnPage: React.FC = () => {
           goalUserBalance: isToday ? data.value : null,
           projectedUserBalance: isToday ? data.value : null,
         };
-      });
+      },
+    );
+
     updatedLineChartData.push({
       date: new Date(schoolEndDate).toLocaleDateString("en-US"),
       actualUserBalance: null,
@@ -191,65 +180,86 @@ const BurnPage: React.FC = () => {
     });
 
     const balanceValues = userBalanceDataFromAugustToToday.map(
-      (data) => data.value
+      (data: any) => data.value,
     );
     balanceValues.push(projectedBalanceOnMay1, goalSavingsOnMay1);
+    const minBalanceData = Math.min(...balanceValues);
+    const maxBalanceData = Math.max(...balanceValues);
+    const maxDataDifference = maxBalanceData - minBalanceData;
 
-    setMinBalanceData(Math.min(...balanceValues));
-    setMaxBalanceData(Math.max(...balanceValues));
-    setMaxDataDifference(minBalanceData - maxBalanceData);
-
-    setLinechartData(updatedLineChartData);
+    return {
+      lineChartData: updatedLineChartData,
+      minBalanceData,
+      maxBalanceData,
+      maxDataDifference,
+    };
   };
 
-  const loadData = useCallback(async () => {
-    const userData = await me();
-    if (!userData || userData.burn_rate_goal === null) {
-      navigate("/burn-rate-goal");
-      return;
-    }
+  const updateAllStates = (processedData: any) => {
+    const {
+      totalUserCash,
+      projectedSavingsInMay,
+      transformedBalanceChanges,
+      balanceChangeThisMonth,
+      usersBalanceAtStartOfMonth,
+      monthlyBudgetAmount,
+      remainingBudgetThisMonth,
+      totalBalanceChange,
+      userBalanceInAugustCalculation,
+      userBalanceDataPointsFromAugustToToday,
+    } = processedData;
 
-    const overviewData = await fetchAccountsOverview(axiosPrivate);
-    console.log("\n\noverviewData\n\n");
-    console.log(overviewData);
-    console.log("\n\noverviewData\n\n");
-    const balanceData = await fetchAccountBalancesOverTime(
-      axiosPrivate,
-      userData.id
-    );
-    console.log("\n\nbalanceData\n\n");
-    console.log(balanceData);
-    console.log("\n\nbalanceData\n\n");
-    // Transform API response to balanceChanges format.
-    const transformedBalanceChanges = balanceData.reduce(
-      (acc: any, curr: any) => {
-        const startDateStr = new Date(curr.start_date).toLocaleDateString();
-        acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
-        return acc;
-      },
-      {}
-    );
-    processAccountsOverview(overviewData);
-
-    // setBalanceChanges(balanceData as { [key: string]: number });
+    setUserBalanceToday(totalUserCash);
+    setProjectedUserBalanceInMay(projectedSavingsInMay);
     setBalanceChanges(transformedBalanceChanges);
-    calculateAmountSpentThisMonth(balanceChanges);
-    calculateUserBalanceAtStartOfMonth();
-    calculateMonthlyAndRemainingBudget();
-    calculateUserBalanceInAndUserBalanceChangeSinceAugust(balanceChanges);
-    processUserBalanceDataFromAugustToToday(balanceChanges);
-    createLinechartData(
-      userBalanceDataFromAugustToToday,
-      projectedUserBalanceInMay,
-      goalSavings
-    );
-  }, [me, navigate, axiosPrivate]);
+    setAmountSpentThisMonth(balanceChangeThisMonth);
+    setUserBalanceAtStartOfMonth(usersBalanceAtStartOfMonth);
+    setMonthlyBudget(monthlyBudgetAmount);
+    setRemainingBudget(remainingBudgetThisMonth);
+    setUserBalanceChangeSinceAugust(totalBalanceChange);
+    setUserBalanceInAugust(userBalanceInAugustCalculation);
+    setUserBalanceDataFromAugustToToday(userBalanceDataPointsFromAugustToToday);
 
-  // useEffect for loading data before page renders
+    const { lineChartData, minBalanceData, maxBalanceData, maxDataDifference } =
+      prepareLinechartData(
+        userBalanceDataPointsFromAugustToToday,
+        projectedSavingsInMay,
+        user?.burn_rate_goal ?? 0,
+        schoolEndDate,
+      );
+    setMinBalanceData(minBalanceData);
+    setMaxBalanceData(maxBalanceData);
+    setMaxDataDifference(maxDataDifference);
+    setLinechartData(lineChartData);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const userData = await me();
+      if (!userData || userData.burn_rate_goal === null) {
+        navigate("/burn-rate-goal");
+        return;
+      }
+
+      const overviewData = await fetchAccountsOverview(axiosPrivate);
+      const balanceData = await fetchAccountBalancesOverTime(
+        axiosPrivate,
+        userData.id,
+      );
+      const processedData = processAllData(overviewData, balanceData, me);
+      updateAllStates(processedData);
+    } catch (error) {
+      console.error("error loading data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useEffect for loading data
   useEffect(() => {
-    loadData();
-    setLoading(false);
-  }, [linechartData.length]);
+    loadData().finally(() => setLoading(false));
+  }, []);
 
   if (loading) {
     return (

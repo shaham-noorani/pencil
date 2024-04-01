@@ -34,11 +34,16 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
     const access_token = await exchangePlaidPublicTokenForAccessToken(
       public_token
     );
+<<<<<<< HEAD
     const createPlaidItemResponse = await createPlaidItem(
       access_token,
       user.id,
       null
     );
+=======
+    // const createPlaidItemResponse = await createPlaidItem(access_token, user.id);
+    // Why is this throwing an error?
+>>>>>>> origin/main
 
     //const transactions = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
     const transactions = await getSyncedTransactions(access_token, "");

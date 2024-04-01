@@ -10,7 +10,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
 import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
-import { getDayLabels } from "../utils/getDayLabels"; // Assume this is a utility function you've created
+import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
 
@@ -32,18 +32,26 @@ const DashboardPage = () => {
   const [netWorthData, setNetWorthData] = useState<NetWorthDataPoint[]>([]);
 
   useEffect(() => {
-    me().then((user) => {
-      axiosPrivate
-        .get(`/plaidItem/user/${user.id}`)
-        .catch(() => {
-          navigate("/connect-account");
-        })
-        .then(() => {
-          fetchAccountsOverview();
-          fetchUserNetWorthData(user);
-          setLoading(false);
-        });
-    });
+    const loadData = async () => {
+      try {
+        const user = await me();
+        // Attempt to get the Plaid item for the user
+        await axiosPrivate.get(`/plaidItem/user/${user.id}`);
+
+        // If successful, proceed with fetching account overview and net worth data
+        await Promise.all([
+          fetchAccountsOverview(),
+          fetchUserNetWorthData(user),
+        ]);
+      } catch (error) {
+        console.error("Error fetching users plaid item entry: ", error);
+        navigate("/connect-account");
+        return;
+      }
+      setLoading(false);
+    };
+
+    loadData();
   }, []);
 
   const fetchAccountsOverview = async () => {
@@ -57,7 +65,7 @@ const DashboardPage = () => {
   const fetchUserNetWorthData = async (user: any) => {
     try {
       const { data } = await axiosPrivate.get(
-        `/netWorth/user/last7/${user.id}`,
+        `/netWorth/user/last7/${user.id}`
       );
       processUserNetWorths(data);
     } catch (error) {
@@ -108,7 +116,7 @@ const DashboardPage = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum: number, account: { value: number }) => sum + account.value,
-      0,
+      0
     );
     setTotalCashBalance(totalUserCash);
     setCashAccounts(cashAccountsList);
@@ -149,8 +157,9 @@ const DashboardPage = () => {
       </Box>
       <Box
         className={`dashboard-box-tabs stage${stage}`}
-        width="full"
+        width="98vw"
         pt="20px"
+        pb="100px"
       >
         <CashTabComponent
           accounts={cashAccounts}
