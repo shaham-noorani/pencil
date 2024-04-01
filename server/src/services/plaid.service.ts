@@ -246,3 +246,36 @@ export const addTransactionArrayToSpendings = async (
   }
   const regressionResult = await buildLinearRegression(user_id);
 };
+
+export const getAccountsOverviewService = async (id: number) => {
+  const user = await getUserByIdService(id);
+  let plaid_items = await getPlaidItemsByUserId(id);
+  if (!plaid_items) {
+    plaid_items = [];
+  }
+
+  const accountsOverview: { [key: string]: PlaidAccount[] } = {};
+
+  for (const plaid_item of plaid_items) {
+    const accounts = await getAccountsForPlaidToken(plaid_item.token);
+    const institution_name = await getInstitutionNameForPlaidToken(
+      plaid_item.token
+    );
+
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i] as PlaidAccount;
+
+      if (institution_name) {
+        account.institution_name = institution_name;
+      }
+
+      const type: string = account.type;
+      if (!(type in accountsOverview)) {
+        accountsOverview[type] = [];
+      }
+      accountsOverview[type].push(account);
+    }
+  }
+
+  return accountsOverview;
+};
