@@ -8,11 +8,12 @@ import LinechartNetWorth from "../modules/dashboard/LinechartNetWorth";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
-import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
 import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
+import BankAccount from "../models/bankAccount.model";
+import axios from "axios";
 
 const DashboardPage = () => {
   const me = useMe();
@@ -21,7 +22,10 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [stage, setStage] = useState(0);
-  const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
+  const [cashAccounts, setCashAccounts] = useState<BankAccount[]>([]);
+  const [loanAccounts, setLoanAccounts] = useState<BankAccount[]>([]);
+  const [investmentAccounts, setInvestmentAccounts] = useState<BankAccount[]>([]);
+  const [creditCardAccounts, setCreditCardAccounts] = useState<BankAccount[]>([]);
   const [totalCashBalance, setTotalCashBalance] = useState<number>(0);
   const [netWorthForLast7Days, setNetWorthForLast7Days] = useState<number[]>([
     0, 0, 0, 0, 0, 0, 0,
@@ -37,6 +41,8 @@ const DashboardPage = () => {
         const user = await me();
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
+        // await axiosPrivate.post(`/plaid/refresh_transaction_data`);
+        // await axiosPrivate.post(`/plaid/refresh_net_worth`);
 
         // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
@@ -109,13 +115,13 @@ const DashboardPage = () => {
     const cashAccountsList =
       data.depository?.map((account) => ({
         bankName: account.institution_name,
-        last4CCNumber: account.mask,
+        last4AccountNumber: account.mask,
         bankNickname: account.name,
-        value: account.balances.available,
+        balance: account.balances.available,
       })) || [];
 
     const totalUserCash = cashAccountsList.reduce(
-      (sum: number, account: { value: number }) => sum + account.value,
+      (sum: number, account: { balance: number }) => sum + account.balance,
       0
     );
     setTotalCashBalance(totalUserCash);

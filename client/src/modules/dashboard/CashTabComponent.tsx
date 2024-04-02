@@ -8,15 +8,10 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import BankAccount from "../../models/bankAccount.model";
 
-interface Account {
-  bankName: string;
-  last4CCNumber: string;
-  bankNickname: string;
-  value: number;
-}
 interface CashTabComponentProps {
-  accounts: Account[];
+  accounts: BankAccount[];
   label: string;
   totalValue: number;
 }
@@ -64,14 +59,24 @@ const CashTabComponent = ({
       <Collapse in={isOpen}>
         <VStack px={1} align="stretch">
           {accounts.map((account, index) => (
-            <Box key={index} p={3} bg="#151515" borderRadius="md">
-              <Text color="white">
-                {account.bankNickname} - ${account.value.toLocaleString()}
+            <Flex
+              key={index}
+              p={3}
+              bg="#151515"
+              borderRadius="md"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <VStack align="flex-start" spacing={0}>
+                <Text color="white">{account.bankNickname}</Text>
+                <Text color="gray.400">
+                  {account.bankName} (...{account.last4AccountNumber})
+                </Text>
+              </VStack>
+              <Text color="white" fontSize="lg" fontWeight="semibold">
+                ${account.balance.toLocaleString()}
               </Text>
-              <Text color="gray.400">
-                {account.bankName} (...{account.last4CCNumber})
-              </Text>
-            </Box>
+            </Flex>
           ))}
         </VStack>
       </Collapse>
