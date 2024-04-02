@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserByEmail } from "../services/user.service";
+import { getUserByEmail, getUserByIdService } from "../services/user.service";
 import { createPlaidItem, getPlaidItemsByUserId } from "../services/plaidItem.service";
 import { createPlaidLinkToken, exchangePlaidPublicTokenForAccessToken, getAccountsForPlaidToken, getSyncedTransactions, addTransactionArrayToSpendings, getTransactionsWithinDateRange, getMostRecentAugust, getInstitutionNameForPlaidToken } from "../services/plaid.service";
 import { AccountBase, AccountType } from "plaid";
@@ -22,6 +22,7 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
 
     const user = await getUserByEmail(req.body.email);
     const public_token = req.body.public_token;
+    
     const access_token = await exchangePlaidPublicTokenForAccessToken(public_token);
     const createPlaidItemResponse = await createPlaidItem(access_token, user.id, null);
 
@@ -134,4 +135,37 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
+};
+
+export const getAccountsOverviewService = async (id: number) => {
+  const user = await getUserByIdService(id);
+  let plaid_items = await getPlaidItemsByUserId(id);
+  if (!plaid_items) {
+    plaid_items = [];
+  }
+
+  const accountsOverview: { [key: string]: PlaidAccount[] } = {};
+
+  for (const plaid_item of plaid_items) {
+    const accounts = await getAccountsForPlaidToken(plaid_item.token);
+    const institution_name = await getInstitutionNameForPlaidToken(
+      plaid_item.token
+    );
+
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i] as PlaidAccount;
+
+      if (institution_name) {
+        account.institution_name = institution_name;
+      }
+
+      const type: string = account.type;
+      if (!(type in accountsOverview)) {
+        accountsOverview[type] = [];
+      }
+      accountsOverview[type].push(account);
+    }
+  }
+
+  return accountsOverview;
 };
