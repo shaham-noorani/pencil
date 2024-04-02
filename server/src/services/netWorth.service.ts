@@ -7,7 +7,7 @@ export const createOrUpdateNetWorth = async (
 ): Promise<NetWorth> => {
 
   const curr_amount = await pool.query(
-    "SELECT spent_amount,id FROM user_net_worth WHERE user_id = $1, start_date = $2, end_date = $3, ",
+    "SELECT spent_amount,id FROM user_net_worth WHERE user_id = $1 AND start_date = $2 AND end_date = $3, ",
     [networth.user_id, networth.start_date, networth.end_date]
   );
 
@@ -17,7 +17,7 @@ export const createOrUpdateNetWorth = async (
   }
 
   const curr_id = curr_amount.rows[0]["id"];
-  let new_amount = curr_amount.rows[0]["spent_amount"] + networth.spent_amount;
+  let new_amount = networth.spent_amount;
 
   const update_spend = await pool.query(
     "UPDATE user_net_worth SET spent_amount = $1 WHERE id = $2 RETURNING *",
