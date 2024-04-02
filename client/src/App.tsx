@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import BurnPage from "./pages/BurnPage";
 import BurnRateGoal from "./pages/BurnRateGoalPage";
 import ConnectAccountPage from "./pages/ConnectAccountPage";
+import FunBudgetPage from "./pages/FunBudgetPage";
 
 function App() {
   return (
@@ -15,13 +16,17 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/plaid" element={<PlaidLink />} />
+          <Route
+            path="/plaid"
+            element={<PlaidLink type="connect-first-account" />}
+          />
           <Route element={<PersistAuth />}>
             <Route element={<RequireAuth />}>
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/burn" element={<BurnPage />} />
                 <Route path="/burn-rate-goal" element={<BurnRateGoal />} />
+                <Route path="/fun-budget" element={<FunBudgetPage />} />
                 <Route
                   path="/connect-account"
                   element={<ConnectAccountPage />}

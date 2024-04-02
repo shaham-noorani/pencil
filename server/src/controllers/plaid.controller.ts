@@ -104,14 +104,16 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
     const user = await getUserByEmail(req.body.email);
     let plaid_items = await getPlaidItemsByUserId(user.id);
     if (!plaid_items) {
-      plaid_items = []
+      plaid_items = [];
     }
-    
+
     const accountsOverview: { [key: string]: PlaidAccount[] } = {};
 
     for (const plaid_item of plaid_items) {
       const accounts = await getAccountsForPlaidToken(plaid_item.token);
-      const institution_name = await getInstitutionNameForPlaidToken(plaid_item.token);
+      const institution_name = await getInstitutionNameForPlaidToken(
+        plaid_item.token
+      );
 
       for (let i = 0; i < accounts.length; i++) {
         const account = accounts[i] as PlaidAccount;
@@ -119,14 +121,14 @@ export const getAccountsOverview = async (req: Request, res: Response) => {
         if (institution_name) {
           account.institution_name = institution_name;
         }
-        
+
         const type: string = account.type;
         if (!(type in accountsOverview)) {
           accountsOverview[type] = [];
         }
         accountsOverview[type].push(account);
       }
-    };
+    }
 
     res.status(200).json(accountsOverview);
   } catch (error: any) {

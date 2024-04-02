@@ -1,4 +1,5 @@
 import { Box, Flex, IconButton } from "@chakra-ui/react";
+import { BiBeer } from "react-icons/bi";
 import { FiHome, FiTrendingUp } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -18,6 +19,14 @@ const Navbar: React.FC = () => {
           <IconButton
             aria-label="Burn"
             icon={<FiTrendingUp />}
+            colorScheme="white"
+            size="lg"
+          />
+        </Link>
+        <Link to="/fun-budget">
+          <IconButton
+            aria-label="Fun Budget"
+            icon={<BiBeer />}
             colorScheme="white"
             size="lg"
           />

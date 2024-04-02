@@ -22,7 +22,7 @@ const ConnectAccountPage = () => {
         </Text>
       </Box>
       <Flex width="100%" px="10%" mt="65vh">
-        {<PlaidLink />}
+        {<PlaidLink type="connect-first-account" />}
       </Flex>
     </Flex>
   );
