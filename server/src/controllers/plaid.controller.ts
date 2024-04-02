@@ -19,15 +19,18 @@ export const createLinkToken = async (req: Request, res: Response) => {
 
 export const plaidItemInitialSetup = async (req: Request, res: Response) => {
   try {
+
     const user = await getUserByEmail(req.body.email);
     const public_token = req.body.public_token;
     const access_token = await exchangePlaidPublicTokenForAccessToken(public_token);
     const createPlaidItemResponse = await createPlaidItem(access_token, user.id, null);
 
-    //const transactions = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
-    const transactions = await getSyncedTransactions(access_token, user.id, "");
-    await addTransactionArrayToSpendings(user.id, transactions);
-    res.status(200).json({ public_token_exchange: "complete" });
+    //const transactions_date = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
+    //console.log(transactions_date.length);
+
+    const transactions = await getSyncedTransactions(access_token, user.id, undefined);
+    const addTransactionResult = await addTransactionArrayToSpendings(user.id, transactions);
+    res.status(200).json({ result: addTransactionResult});
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -90,7 +93,7 @@ export const refreshPlaidNetWorth = async (req: Request, res: Response) => {
       end_date: date,
     });
 
-    res.status(200).json({net_worth_update: "complete"});
+    res.status(200).json({net_worth_update: netWorthResult});
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

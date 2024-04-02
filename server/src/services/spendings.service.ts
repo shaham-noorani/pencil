@@ -5,12 +5,10 @@ import Spendings from "../models/spendings.model";
 export const createOrUpdateSpending = async (
   spending: Spendings
 ): Promise<Spendings> => {
-
   const curr_amount = await pool.query(
-    "SELECT spent_amount,id FROM user_spendings WHERE user_id = $1, start_date = $2, end_date = $3, ",
+    "SELECT * FROM user_spendings WHERE user_id = $1 AND start_date = $2 AND end_date = $3",
     [spending.user_id, spending.start_date, spending.end_date]
   );
-
   //If found nothing, this must be the first account added for this user
   if (curr_amount.rows.length === 0){
     return createSpendings(spending);
@@ -25,7 +23,6 @@ export const createOrUpdateSpending = async (
   );
 
   return update_spend.rows[0];
-
 }
 
 
