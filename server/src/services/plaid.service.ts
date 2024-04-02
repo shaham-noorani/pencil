@@ -10,8 +10,10 @@ import {
     Transaction,
     RemovedTransaction,
     TransactionsSyncRequest,
+    LinkTokenCreateRequest,
   } from "plaid";
 import { buildLinearRegression, createSpendings, createOrUpdateSpending } from "./spendings.service";
+import { updatePlaidItemSynchToken } from "./plaidItem.service";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -21,7 +23,7 @@ const PLAID_ENV = process.env.PLAID_ENV || "sandbox";
 // Link. Note that this list must contain 'assets' in order for the app to be
 // able to create and retrieve asset reports.
 const PLAID_PRODUCTS = (
-    process.env.PLAID_PRODUCTS || Products.Transactions
+    process.env.PLAID_PRODUCTS || Products.Transactions || Products.Auth || Products.Balance
   ).split(",");
   
   // PLAID_COUNTRY_CODES is a comma-separated list of countries for which users
@@ -57,7 +59,7 @@ const PLAID_PRODUCTS = (
 const client = new PlaidApi(configuration);
 
 export const createPlaidLinkToken = async (user_id: string) => {
-    const request = {
+    const request:LinkTokenCreateRequest = {
         user: {
           // This should correspond to a unique id for the current user.
           client_user_id: user_id,
@@ -66,6 +68,9 @@ export const createPlaidLinkToken = async (user_id: string) => {
         products: [Products.Auth, Products.Transactions],
         language: "en",
         country_codes: [CountryCode.Us, CountryCode.Ca],
+        transactions: {
+            days_requested: 364
+        }
     };
   
     const createTokenResponse = await client.linkTokenCreate(request);
@@ -144,7 +149,7 @@ export const getTransactionsWithinDateRange = async(token:string, start_date: Da
             start_date: start_date_string,
             end_date: end_date_string,
             options: {
-            offset: transactions.length,
+                offset: transactions.length,
             },
         };
         const paginatedResponse = await client.transactionsGet(paginatedRequest);
@@ -155,31 +160,37 @@ export const getTransactionsWithinDateRange = async(token:string, start_date: Da
     return transactions;
 }
 
-export const getSyncedTransactions = async(token: string, cursor: string) => {
+export const getSyncedTransactions = async(token: string, user_id: number, cursor: string|undefined) => {
     let added: Array<Transaction> = [];
-    let modified: Array<Transaction> = [];
-    let removed: Array<RemovedTransaction> = [];
     
     let hasMore = true;
-    let curr_cursor = cursor;
+    let curr_cursor: string|undefined = cursor;
+
     // Iterate through each page of new transaction updates for item
     while (hasMore) {
         const request: TransactionsSyncRequest = {
             access_token: token,
+            cursor: curr_cursor,
+            options: {
+                days_requested: 270
+            }
         };
-        if (cursor.length > 0) {
-            request.cursor = curr_cursor;
-        }
+
         const response = await client.transactionsSync(request);
         const data = response.data;
         // Add this page of results
         added = added.concat(data.added);
-        modified = modified.concat(data.modified);
-        removed = removed.concat(data.removed);
         hasMore = data.has_more;
         // Update cursor to the next cursor
         curr_cursor = data.next_cursor;
     }
+
+    let db_cursor: string|null = null;
+    if (curr_cursor) {
+        db_cursor = curr_cursor;
+    }
+
+    const updatedSyncTokenResponse = await updatePlaidItemSynchToken(user_id, db_cursor);
 
     return added;
 }
@@ -201,6 +212,7 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
         }
         groupedTransactions[sunday.toDateString()] += transaction.amount;
     });
+    //console.log(groupedTransactions);
 
     let start_sunday = getSundayOfWeek(earliest_sunday);
     const curr_sunday = getSundayOfWeek(new Date());
@@ -215,7 +227,7 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
         let next_sunday = new Date(curr_sunday);
         next_sunday.setDate(next_sunday.getDate() + 7);
         next_sunday.setTime(next_sunday.getTime() - 1);
-        
+
         const spending = await createOrUpdateSpending({
             id: 0,
             start_date: new Date(curr_sunday),
@@ -223,8 +235,6 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
             spent_amount: amount,
             user_id: user_id
         });
-        //console.log(spending);
-
         curr_sunday.setDate(curr_sunday.getDate() - 7);
     }
     const regressionResult = await buildLinearRegression(user_id);
