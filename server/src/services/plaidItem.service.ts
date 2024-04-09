@@ -12,7 +12,7 @@ export const createPlaidItem = async (token: string, user_id: number, synch_toke
 
 export const updatePlaidItemSynchToken = async (user_id: number, synch_token: string|null) => {
   const update_plaid_item = await pool.query(
-    "UPDATE plaid_item SET synch_token = $1 WHERE id = $2 RETURNING *",
+    "UPDATE plaid_item SET synch_token = $1 WHERE user_id = $2 RETURNING *",
     [synch_token, user_id]
   );
   return update_plaid_item;

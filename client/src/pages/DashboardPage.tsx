@@ -37,6 +37,8 @@ const DashboardPage = () => {
         const user = await me();
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
+        await axiosPrivate.post("plaid/refresh_transaction_data");
+        await axiosPrivate.post("plaid/refresh_net_worth");
 
         // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
