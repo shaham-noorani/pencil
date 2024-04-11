@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Box,
   Flex,
   Text,
   VStack,
@@ -8,7 +7,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
-import BankAccount from "../../models/bankAccount.model";
+import BankAccount from "../../models/bankAccountBase.model";
 
 interface CashTabComponentProps {
   accounts: BankAccount[];
@@ -39,7 +38,7 @@ const CashTabComponent = ({
         </Text>
         <Flex align="center">
           <Text color="white" mr={2}>
-            ${totalValue.toLocaleString()}
+            {formatCurrency(totalValue)}
           </Text>
           <IconButton
             icon={
@@ -62,7 +61,7 @@ const CashTabComponent = ({
             <Flex
               key={index}
               p={3}
-              bg="#151515"
+              bg="#1a1a1a"
               borderRadius="md"
               justifyContent="space-between"
               alignItems="center"
@@ -70,11 +69,11 @@ const CashTabComponent = ({
               <VStack align="flex-start" spacing={0}>
                 <Text color="white">{account.bankNickname}</Text>
                 <Text color="gray.400">
-                  {account.bankName} (...{account.last4AccountNumber})
+                  {account.institutionName} (...{account.last4AccountNumber})
                 </Text>
               </VStack>
               <Text color="white" fontSize="lg" fontWeight="semibold">
-                ${account.balance.toLocaleString()}
+                {formatCurrency(account.balance)}
               </Text>
             </Flex>
           ))}
@@ -85,3 +84,16 @@ const CashTabComponent = ({
 };
 
 export default CashTabComponent;
+
+function formatCurrency(value: number) {
+  // Check if the number is an integer
+  const isInteger = Number.isInteger(value);
+
+  // If it's an integer, use no decimal places; otherwise, use two.
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: isInteger ? 0 : 2,
+    maximumFractionDigits: isInteger ? 0 : 2
+  }).format(value);
+}
