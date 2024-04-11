@@ -12,8 +12,10 @@ import {
     TransactionsSyncRequest,
     LinkTokenCreateRequest,
   } from "plaid";
+import PlaidAccount from "../models/plaidAccount.model";
+import { getUserByEmail, getUserByIdService } from "../services/user.service";
 import { buildLinearRegression, createSpendings, createOrUpdateSpending } from "./spendings.service";
-import { updatePlaidItemSynchToken } from "./plaidItem.service";
+import { updatePlaidItemSynchToken, createPlaidItem, getPlaidItemsByUserId } from "./plaidItem.service";
 
 const PLAID_CLIENT_ID = process.env.PLAID_CLIENT_ID;
 const PLAID_SECRET = process.env.PLAID_SECRET;
@@ -54,8 +56,8 @@ const PLAID_PRODUCTS = (
         "Plaid-Version": "2020-09-14",
       },
     },
-  });
-  
+});
+
 const client = new PlaidApi(configuration);
 
 export const createPlaidLinkToken = async (user_id: string) => {
@@ -85,59 +87,63 @@ export const exchangePlaidPublicTokenForAccessToken = async (public_token: strin
 }
 
 export const getAccountsForPlaidToken = async (token: string) => {
-    const response = await client.accountsGet({
-        access_token: token
-      });
-    return response.data.accounts;
-}
+  const response = await client.accountsGet({
+    access_token: token,
+  });
+  return response.data.accounts;
+};
 
 export const getInstitutionNameForPlaidToken = async (token: string) => {
-    const getItemResponse = await client.itemGet({
-        access_token: token
-      });
-    const instituion_id = getItemResponse.data.item.institution_id;
-    if (instituion_id) {
-        const institutionNameResponse = await client.institutionsGetById({
-            institution_id: instituion_id,
-            country_codes: [CountryCode.Us, CountryCode.Ca]
-        });
-        return institutionNameResponse.data.institution.name;
-    }
-    return "";
-}
+  const getItemResponse = await client.itemGet({
+    access_token: token,
+  });
+  const instituion_id = getItemResponse.data.item.institution_id;
+  if (instituion_id) {
+    const institutionNameResponse = await client.institutionsGetById({
+      institution_id: instituion_id,
+      country_codes: [CountryCode.Us, CountryCode.Ca],
+    });
+    return institutionNameResponse.data.institution.name;
+  }
+  return "";
+};
 
 export const getSundayOfWeek = (date: Date): Date => {
-    const dayOfWeek = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-    const diff = date.getDate() - dayOfWeek; // Subtract the current day of the week to get Sunday
-  
-    // Create a new Date object with the corresponding Sunday
-    const sunday = new Date(date);
-    sunday.setDate(diff);
-    sunday.setHours(0,0,0,0);
-  
-    return sunday;
-}
+  const dayOfWeek = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+  const diff = date.getDate() - dayOfWeek; // Subtract the current day of the week to get Sunday
+
+  // Create a new Date object with the corresponding Sunday
+  const sunday = new Date(date);
+  sunday.setDate(diff);
+  sunday.setHours(0, 0, 0, 0);
+
+  return sunday;
+};
 
 export const getMostRecentAugust = (): Date => {
-    let august_date = new Date();
-    if (august_date.getMonth() < 7) {
-      august_date.setFullYear(august_date.getFullYear() - 1);
-    }
-    august_date.setMonth(7);
-    august_date.setDate(1);
-    august_date.setHours(0,0,0,0);
+  let august_date = new Date();
+  if (august_date.getMonth() < 7) {
+    august_date.setFullYear(august_date.getFullYear() - 1);
+  }
+  august_date.setMonth(7);
+  august_date.setDate(1);
+  august_date.setHours(0, 0, 0, 0);
 
-    return august_date;
-}
+  return august_date;
+};
 
-export const getTransactionsWithinDateRange = async(token:string, start_date: Date, end_date: Date) => {
-    const start_date_string = start_date.toISOString().split('T')[0];
-    const end_date_string = end_date.toISOString().split('T')[0];
-    const request: TransactionsGetRequest = {
-        access_token: token,
-        start_date: start_date_string,
-        end_date: end_date_string
-    };
+export const getTransactionsWithinDateRange = async (
+  token: string,
+  start_date: Date,
+  end_date: Date
+) => {
+  const start_date_string = start_date.toISOString().split("T")[0];
+  const end_date_string = end_date.toISOString().split("T")[0];
+  const request: TransactionsGetRequest = {
+    access_token: token,
+    start_date: start_date_string,
+    end_date: end_date_string,
+  };
   
     const response = await client.transactionsGet(request);
     let transactions = response.data.transactions;
@@ -236,6 +242,39 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
             user_id: user_id
         });
         curr_sunday.setDate(curr_sunday.getDate() - 7);
+     }
+  const regressionResult = await buildLinearRegression(user_id);
+};
+
+export const getAccountsOverviewService = async (id: number) => {
+  const user = await getUserByIdService(id);
+  let plaid_items = await getPlaidItemsByUserId(id);
+  if (!plaid_items) {
+    plaid_items = [];
+  }
+
+  const accountsOverview: { [key: string]: PlaidAccount[] } = {};
+
+  for (const plaid_item of plaid_items) {
+    const accounts = await getAccountsForPlaidToken(plaid_item.token);
+    const institution_name = await getInstitutionNameForPlaidToken(
+      plaid_item.token
+    );
+
+    for (let i = 0; i < accounts.length; i++) {
+      const account = accounts[i] as PlaidAccount;
+
+      if (institution_name) {
+        account.institution_name = institution_name;
+      }
+
+      const type: string = account.type;
+      if (!(type in accountsOverview)) {
+        accountsOverview[type] = [];
+      }
+      accountsOverview[type].push(account);
     }
-    const regressionResult = await buildLinearRegression(user_id);
-}
+  }
+
+  return accountsOverview;
+};
