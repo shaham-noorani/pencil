@@ -20,6 +20,7 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>("");
 
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
@@ -36,6 +37,7 @@ const DashboardPage = () => {
     const loadData = async () => {
       try {
         const user = await me();
+        setUserId(user.id as string);
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
         await axiosPrivate.post("plaid/refresh_transaction_data");
@@ -141,7 +143,7 @@ const DashboardPage = () => {
       justifyContent="flex-start"
     >
       <Box className={`dashboard-box-header stage${stage}`} width="full">
-        <HeaderNetWorth />
+        <HeaderNetWorth userId={userId}/>
       </Box>
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
