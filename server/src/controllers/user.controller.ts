@@ -32,10 +32,26 @@ export const getUserById = async (req: Request, res: Response) => {
 //Delete Users
 export const deleteUser = async (req: Request, res: Response) => {
   try {
+    const result2 = await pool.query(
+      "DELETE FROM user_spendings WHERE user_id = $1 RETURNING *",
+      [req.params.id]
+    );
+
+    const result3 = await pool.query(
+      "DELETE FROM user_net_worth WHERE user_id = $1 RETURNING *",
+      [req.params.id]
+    );
+
+    const result4 = await pool.query(
+      "DELETE FROM plaid_item WHERE user_id = $1 RETURNING *",
+      [req.params.id]
+    );
+
     const result = await pool.query(
       "DELETE FROM users WHERE id = $1 RETURNING *",
-      [req.params.id],
+      [req.params.id]
     );
+
     const user = result.rows[0];
 
     if (!user) {
