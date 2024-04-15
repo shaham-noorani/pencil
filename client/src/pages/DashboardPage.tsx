@@ -13,6 +13,7 @@ import NetWorthEntry from "../models/netWorthEntry.model";
 import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
+import PlaidLink from "../modules/auth/PlaidLink";
 
 const DashboardPage = () => {
   const me = useMe();
@@ -183,6 +184,7 @@ const DashboardPage = () => {
           label="Loans"
           totalValue={totalCashBalance}
         />
+        <PlaidLink type="connect-another-account" />
       </Box>
     </VStack>
   );

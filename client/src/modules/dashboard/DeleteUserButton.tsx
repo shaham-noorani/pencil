@@ -17,13 +17,14 @@ const DeleteUserButton: React.FC<DeleteUserButtonProps> = ({ userId }) => {
   const deleteUser = async () => {
     setIsDeleting(true);
     try {
-      await axiosPrivate.delete(`/users/${userId}`);
+      await axiosPrivate.delete(`/user/${userId}`);
       toast({
         title: 'User deleted',
         description: `The user with ID ${userId} has been successfully deleted.`,
         status: 'success',
         duration: 9000,
         isClosable: true,
+        position: 'top'
       });
       navigate("/login");
     } catch (error) {
@@ -34,6 +35,7 @@ const DeleteUserButton: React.FC<DeleteUserButtonProps> = ({ userId }) => {
         status: 'error',
         duration: 9000,
         isClosable: true,
+        position: 'top'
       });
     }
     setIsDeleting(false);
