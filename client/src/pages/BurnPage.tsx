@@ -287,7 +287,7 @@ const BurnPage: React.FC = () => {
           bg="black"
         >
           <BurnRateOnTrack
-            projectedSavings={projectedUserBalanceInMay - 198}
+            projectedSavings={projectedUserBalanceInMay}
             goalSavings={goalSavings}
           />
           <BurnRateLinechart

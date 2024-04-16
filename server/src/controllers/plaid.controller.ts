@@ -25,11 +25,7 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
     const access_token = await exchangePlaidPublicTokenForAccessToken(public_token);
     const createPlaidItemResponse = await createPlaidItem(access_token, user.id, null);
 
-    //const transactions_date = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
-    //console.log(transactions_date.length);
-
     const transactions = await getSyncedTransactions(access_token, user.id, undefined);
-    console.log("plaidItemInitialSetup: transactions.length was: ", transactions.length);
     const addTransactionResult = await addTransactionArrayToSpendings(user.id, transactions);
     res.status(200).json({ result: addTransactionResult});
   } catch (error: any) {
@@ -41,16 +37,12 @@ export const refreshPlaidTransactionData = async (req: Request, res: Response) =
   try {
     const user = await getUserByEmail(req.body.email);
     let plaid_items = await getPlaidItemsByUserId(user.id);
-    console.log("refreshPlaidTransactionData: plaid_items is: ", plaid_items);
     if (!plaid_items) {
       plaid_items = []
     }
 
     for (const plaid_item of plaid_items) {
-      console.log("refreshPlaidTransactionData: plaid_item.synch_token BEFORE was: ", plaid_item.synch_token);
       const transactions = await getSyncedTransactions(plaid_item.token, user.id, plaid_item.synch_token);
-      console.log("refreshPlaidTransactionData: transactions.length was: ", transactions.length);
-      console.log("refreshPlaidTransactionData: plaid_item.synch_token AFTER was: ", plaid_item.synch_token);
       await addTransactionArrayToSpendings(user.id, transactions);
     }
     res.status(200);

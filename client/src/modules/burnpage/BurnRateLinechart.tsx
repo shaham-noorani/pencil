@@ -57,14 +57,14 @@ const BurnRateLinechart = ({
         >
           <XAxis
             domain={[augustStartDate.getTime(), schoolEndDate.getTime()]}
-            // scale="time"
-            // type="number"
             stroke="white"
             tick={false}
             dataKey="date"
           />
           <YAxis domain={yAxisDomain} stroke="white" tick={false} />
-          <Tooltip />
+          <Tooltip
+            itemStyle={{ color: "black" }}
+          />{" "}
           <Line
             type="linear"
             dataKey="actualUserBalance"
