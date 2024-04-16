@@ -49,14 +49,14 @@ const SavingsSuggestions = () => {
       <SuggestionItem
         title={"Meal prepping"}
         description={"Save money by preparing your meals in advance!"}
-        link={"https://www.mealprephaven.com/"}
+        link={"https://www.reddit.com/r/MealPrepSunday/"}
       />
       <SuggestionItem
         title={"Set a budget"}
         description={
           "Track your expenses and manage your finances effectively!"
         }
-        link={"https://www.mint.com/"}
+        link={"https://goodbudget.com/"}
       />
       <SuggestionItem
         title={"Apply for scholarships"}
