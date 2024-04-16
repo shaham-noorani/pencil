@@ -7,6 +7,7 @@ export const createOrUpdateNetWorth = async (
 ): Promise<NetWorth> => {
 
   const curr_amount = await pool.query(
+
     "SELECT * FROM user_net_worth WHERE user_id = $1 AND start_date = $2 AND end_date = $3",
     [networth.user_id, networth.start_date, networth.end_date]
   );

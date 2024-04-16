@@ -8,11 +8,11 @@ import LinechartNetWorth from "../modules/dashboard/LinechartNetWorth";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useMe from "../modules/auth/useMe";
-import CashAccount from "../models/cashAccount.model";
 import NetWorthEntry from "../models/netWorthEntry.model";
 import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
+import BankAccountBase from "../models/bankAccountBase.model";
 import PlaidLink from "../modules/auth/PlaidLink";
 
 const DashboardPage = () => {
@@ -23,8 +23,20 @@ const DashboardPage = () => {
   const [userId, setUserId] = useState<string>("");
 
   const [stage, setStage] = useState(0);
-  const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
+  const [cashAccounts, setCashAccounts] = useState<BankAccountBase[]>([]);
+  const [loanAccounts, setLoanAccounts] = useState<BankAccountBase[]>([]);
+  const [investmentAccounts, setInvestmentAccounts] = useState<
+    BankAccountBase[]
+  >([]);
+  const [creditCardAccounts, setCreditCardAccounts] = useState<
+    BankAccountBase[]
+  >([]);
   const [totalCashBalance, setTotalCashBalance] = useState<number>(0);
+  const [totalLoanBalance, setTotalLoanBalance] = useState<number>(0);
+  const [totalInvestmentsBalance, setTotalInvestmentsBalance] =
+    useState<number>(0);
+  const [totalCreditCardBalance, setTotalCreditCardBalance] =
+    useState<number>(0);
   const [netWorthForLast7Days, setNetWorthForLast7Days] = useState<number[]>([
     0, 0, 0, 0, 0, 0, 0,
   ]);
@@ -40,8 +52,10 @@ const DashboardPage = () => {
         setUserId(user.id as string);
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
-        await axiosPrivate.post("plaid/refresh_transaction_data");
-        await axiosPrivate.post("plaid/refresh_net_worth");
+        // update transactions and net worth tables each time dashboard page loads, in case the user added another account
+        await axiosPrivate.post(`/plaid/refresh_transaction_data`);
+        await axiosPrivate.post(`/plaid/refresh_net_worth`);
+
 
         // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
@@ -113,18 +127,56 @@ const DashboardPage = () => {
   const processAccountsOverview = (data: AccountsOverview) => {
     const cashAccountsList =
       data.depository?.map((account) => ({
-        bankName: account.institution_name,
-        last4CCNumber: account.mask,
-        bankNickname: account.name,
-        value: account.balances.available,
+        institutionName: account.institution_name,
+        last4AccountNumber: account.mask,
+        bankNickname: account.official_name,
+        balance: account.balances.available,
       })) || [];
-
     const totalUserCash = cashAccountsList.reduce(
-      (sum: number, account: { value: number }) => sum + account.value,
+      (sum: number, account: { balance: number }) => sum + account.balance,
       0
     );
     setTotalCashBalance(totalUserCash);
     setCashAccounts(cashAccountsList);
+
+    const loanAccountsList = data.loan?.map((account) => ({
+      institutionName: account.institution_name,
+      last4AccountNumber: account.mask,
+      bankNickname: account.official_name,
+      balance: account.balances.available,
+    }));
+    const totalUserLoans = loanAccountsList.reduce(
+      (sum: number, account: { balance: number }) => sum + account.balance,
+      0
+    );
+    setTotalLoanBalance(totalUserLoans);
+    setLoanAccounts(loanAccountsList);
+
+    const investmentAccountsList = data.investment?.map((account) => ({
+      institutionName: account.institution_name,
+      last4AccountNumber: account.mask,
+      bankNickname: account.official_name,
+      balance: account.balances.available,
+    }));
+    const totalUserInvestments = investmentAccountsList.reduce(
+      (sum: number, account: { balance: number }) => sum + account.balance,
+      0
+    );
+    setTotalInvestmentsBalance(totalUserInvestments);
+    setInvestmentAccounts(investmentAccountsList);
+
+    const creditCardsAccountsList = data.credit?.map((account) => ({
+      institutionName: account.institution_name,
+      last4AccountNumber: account.mask,
+      bankNickname: account.official_name,
+      balance: account.balances.available,
+    }));
+    const totalUserCreditCardsBalance = creditCardsAccountsList.reduce(
+      (sum: number, account: { balance: number }) => sum + account.balance,
+      0
+    );
+    setTotalCreditCardBalance(totalUserCreditCardsBalance);
+    setCreditCardAccounts(creditCardsAccountsList);
   };
 
   if (loading) {
@@ -148,7 +200,7 @@ const DashboardPage = () => {
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
           <NetWorthChange
-            netWorthYesterday={netWorthForLast7Days[5]}
+            netWorth1WeekAgo={netWorthForLast7Days[0]}
             netWorthToday={netWorthForLast7Days[6]}
           />
           <NetWorthValue netWorth={netWorthForLast7Days[6]} />
@@ -172,19 +224,19 @@ const DashboardPage = () => {
           totalValue={totalCashBalance}
         />
         <CashTabComponent
-          accounts={cashAccounts}
+          accounts={investmentAccounts}
           label="Investments"
-          totalValue={totalCashBalance}
+          totalValue={totalInvestmentsBalance}
         />
         <CashTabComponent
-          accounts={cashAccounts}
+          accounts={creditCardAccounts}
           label="Credit Cards"
-          totalValue={totalCashBalance}
+          totalValue={totalCreditCardBalance}
         />
         <CashTabComponent
-          accounts={cashAccounts}
+          accounts={loanAccounts}
           label="Loans"
-          totalValue={totalCashBalance}
+          totalValue={totalLoanBalance}
         />
         <PlaidLink type="connect-another-account" />
       </Box>
