@@ -13,12 +13,14 @@ import { getDayLabels } from "../utils/getDayLabels";
 import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
 import BankAccountBase from "../models/bankAccountBase.model";
+import PlaidLink from "../modules/auth/PlaidLink";
 
 const DashboardPage = () => {
   const me = useMe();
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>("");
 
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<BankAccountBase[]>([]);
@@ -47,6 +49,7 @@ const DashboardPage = () => {
     const loadData = async () => {
       try {
         const user = await me();
+        setUserId(user.id as string);
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
         // update transactions and net worth tables each time dashboard page loads, in case the user added another account
@@ -192,7 +195,7 @@ const DashboardPage = () => {
       justifyContent="flex-start"
     >
       <Box className={`dashboard-box-header stage${stage}`} width="full">
-        <HeaderNetWorth />
+        <HeaderNetWorth userId={userId}/>
       </Box>
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">
@@ -235,6 +238,7 @@ const DashboardPage = () => {
           label="Loans"
           totalValue={totalLoanBalance}
         />
+        <PlaidLink type="connect-another-account" />
       </Box>
     </VStack>
   );
