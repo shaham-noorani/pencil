@@ -71,7 +71,7 @@ const BurnPage: React.FC = () => {
   const processAllData = (
     overviewData: AccountsOverview,
     balanceData: any,
-    user: any,
+    user: any
   ) => {
     const cashAccountsList =
       overviewData.depository?.map((account) => ({
@@ -83,7 +83,7 @@ const BurnPage: React.FC = () => {
 
     const totalUserCash = cashAccountsList.reduce(
       (sum, account) => sum + account.value,
-      0,
+      0
     );
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
@@ -94,7 +94,7 @@ const BurnPage: React.FC = () => {
         acc[startDateStr] = (acc[startDateStr] || 0) + curr.spent_amount;
         return acc;
       },
-      {},
+      {}
     );
 
     const balanceChangeThisMonth = Object.entries(transformedBalanceChanges)
@@ -109,16 +109,16 @@ const BurnPage: React.FC = () => {
       monthlyBudgetAmount - balanceChangeThisMonth;
     const totalBalanceChange = Object.values(transformedBalanceChanges).reduce(
       (acc, value) => (acc as number) + (value as number),
-      0,
+      0
     );
     const userBalanceInAugustCalculation =
-      totalUserCash - (totalBalanceChange as number);
+      totalUserCash + (totalBalanceChange as number);
 
     let runningTotal = userBalanceInAugustCalculation;
     const balanceDataPoints = Object.entries(transformedBalanceChanges)
       .sort(
         ([dateA], [dateB]) =>
-          new Date(dateA).getTime() - new Date(dateB).getTime(),
+          new Date(dateA).getTime() - new Date(dateB).getTime()
       )
       .map(([date, change]) => {
         runningTotal -= change as number;
@@ -155,7 +155,7 @@ const BurnPage: React.FC = () => {
     userBalanceDataFromAugustToToday: any,
     projectedBalanceOnMay1: any,
     goalSavingsOnMay1: any,
-    schoolEndDate: any,
+    schoolEndDate: any
   ) => {
     const today = new Date().toLocaleDateString("en-US");
     const updatedLineChartData = userBalanceDataFromAugustToToday.map(
@@ -169,7 +169,7 @@ const BurnPage: React.FC = () => {
           goalUserBalance: isToday ? data.value : null,
           projectedUserBalance: isToday ? data.value : null,
         };
-      },
+      }
     );
 
     updatedLineChartData.push({
@@ -180,7 +180,7 @@ const BurnPage: React.FC = () => {
     });
 
     const balanceValues = userBalanceDataFromAugustToToday.map(
-      (data: any) => data.value,
+      (data: any) => data.value
     );
     balanceValues.push(projectedBalanceOnMay1, goalSavingsOnMay1);
     const minBalanceData = Math.min(...balanceValues);
@@ -225,7 +225,7 @@ const BurnPage: React.FC = () => {
         userBalanceDataPointsFromAugustToToday,
         projectedSavingsInMay,
         user?.burn_rate_goal ?? 0,
-        schoolEndDate,
+        schoolEndDate
       );
     setMinBalanceData(minBalanceData);
     setMaxBalanceData(maxBalanceData);
@@ -245,7 +245,7 @@ const BurnPage: React.FC = () => {
       const overviewData = await fetchAccountsOverview(axiosPrivate);
       const balanceData = await fetchAccountBalancesOverTime(
         axiosPrivate,
-        userData.id,
+        userData.id
       );
       const processedData = processAllData(overviewData, balanceData, me);
       updateAllStates(processedData);

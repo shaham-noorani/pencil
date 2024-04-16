@@ -24,11 +24,7 @@ export const plaidItemInitialSetup = async (req: Request, res: Response) => {
     
     const access_token = await exchangePlaidPublicTokenForAccessToken(public_token);
     const createPlaidItemResponse = await createPlaidItem(access_token, user.id, null);
-
-    //const transactions_date = await getTransactionsWithinDateRange(access_token, getMostRecentAugust(), new Date());
-    //console.log(transactions_date.length);
     const transactions = await getSyncedTransactions(access_token, user.id, undefined);
-    console.log(transactions.length);
     const addTransactionResult = await addTransactionArrayToSpendings(user.id, transactions);
     res.status(200).json({ result: addTransactionResult});
   } catch (error: any) {
@@ -46,7 +42,6 @@ export const refreshPlaidTransactionData = async (req: Request, res: Response) =
 
     for (const plaid_item of plaid_items) {
       const transactions = await getSyncedTransactions(plaid_item.token, user.id, plaid_item.synch_token);
-      console.log(transactions.length);
       await addTransactionArrayToSpendings(user.id, transactions);
     }
     res.status(200).json({message: "complete"});
