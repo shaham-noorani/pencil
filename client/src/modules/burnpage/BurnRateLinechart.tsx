@@ -57,14 +57,29 @@ const BurnRateLinechart = ({
         >
           <XAxis
             domain={[augustStartDate.getTime(), schoolEndDate.getTime()]}
-            // scale="time"
-            // type="number"
             stroke="white"
             tick={false}
             dataKey="date"
           />
           <YAxis domain={yAxisDomain} stroke="white" tick={false} />
-          <Tooltip />
+          <Tooltip
+            itemStyle={{ color: "black" }}
+            formatter={(value, name) => {
+              const nameMap: { [key: string]: string } = {
+                actualUserBalance: "Balance",
+                goalUserBalance: "Goal Balance",
+                projectedUserBalance: "Projected Balance",
+              };
+              const formattedValue =
+                value as number < 0
+                  ? `-$${Math.abs(value as number).toFixed(2)}`
+                  : `$${Number(value).toFixed(2)}`;
+              return [
+                formattedValue,
+                nameMap[name as keyof typeof nameMap] || name,
+              ];
+            }}
+          />{" "}
           <Line
             type="linear"
             dataKey="actualUserBalance"
