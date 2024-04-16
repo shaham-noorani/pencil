@@ -1,8 +1,12 @@
 import { Flex, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
-import PlaidLink from "../auth/PlaidLink";
+import DeleteUserButton from "./DeleteUserButton";
 
-const HeaderNetWorth = () => {
+interface HeaderNetWorthProps {
+  userId: string;
+}
+
+const HeaderNetWorth: React.FC<HeaderNetWorthProps> = ({ userId }) => {
   const today = format(new Date(), "EEEE, MMMM do");
 
   return (
@@ -19,7 +23,7 @@ const HeaderNetWorth = () => {
         <Text fontSize="3xl" fontWeight="bold">
           Home
         </Text>
-        <PlaidLink type="connect-another-account" />
+        <DeleteUserButton userId={userId} />
       </Flex>
       <Text fontSize="md">{today}</Text>
     </Flex>

@@ -42,22 +42,12 @@ const PlaidLink = ({ type }: PlaidLinkProps) => {
   };
   const { open, ready } = usePlaidLink(config);
 
-  if (type === "connect-first-account") {
-    return (
-      <Button width="100%" onClick={() => open()} disabled={!ready}>
-        Link account
-      </Button>
-    );
-  } else {
-    return (
-      <Button
-        leftIcon={<AddIcon color="white" />}
-        onClick={() => open()}
-        disabled={!ready}
-        fontSize={"sm"}
-        bg="#222222"
-      />
-    );
-  }
+  return (
+    <Button width="100%" onClick={() => open()} disabled={!ready}>
+      {type === "connect-first-account"
+        ? "Link Account"
+        : "Link Another Account"}
+    </Button>
+  );
 };
 export default PlaidLink;
