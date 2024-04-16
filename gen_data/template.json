@@ -1,0 +1,98 @@
+{
+    "seed": "my-seed-string-3",
+    "override_accounts": [
+        {
+            "type": "depository",
+            "subtype": "checking",
+            "identity": {
+                "names": [
+                    "Ol Rock"
+                ],
+                "phone_numbers": [
+                    {
+                        "primary": true,
+                        "type": "home",
+                        "data": "9798451060"
+                    }
+                ],
+                "emails": [
+                    {
+                        "primary": true,
+                        "type": "primary",
+                        "data": "olrock@tamu.edu"
+                    }
+                ],
+                "addresses": [
+                    {
+                        "primary": true,
+                        "data": {
+                            "city": "College Station",
+                            "region": "TX",
+                            "street": "750 Agronomy Rd",
+                            "postal_code": "77843",
+                            "country": "US"
+                        }
+                    }
+                ]
+            }
+        },
+        {"transactions": [
+            
+        ]},
+        {
+            "type": "loan",
+            "subtype": "student",
+            "liability": {
+                "type": "student",
+                "origination_date": "2023-01-01",
+                "principal": 10000,
+                "nominal_apr": 6.25,
+                "loan_name": "Plaid Student Loan",
+                "repayment_model": {
+                    "type": "standard",
+                    "non_repayment_months": 12,
+                    "repayment_months": 120
+                }
+            }
+        },
+        {
+            "type": "credit",
+            "subtype": "credit card",
+            "starting_balance": 10000,
+            "inflow_model": {
+                "type": "monthly-interest-only-payment",
+                "payment_day_of_month": 15,
+                "statement_day_of_month": 13,
+                "transaction_name": "Interest Payment"
+            },
+            "liability": {
+                "type": "credit",
+                "purchase_apr": 12.9,
+                "balance_transfer_apr": 15.24,
+                "cash_apr": 28.45,
+                "special_apr": 0,
+                "last_payment_amount": 500,
+                "minimum_payment_amount": 10
+            }
+        },
+        {
+            "type": "investment",
+            "subtype": "brokerage",
+            "investment_transactions": [
+                {
+                    "date": "2023-07-01",
+                    "name": "buy stock",
+                    "quantity": 10,
+                    "price": 10,
+                    "fees": 20,
+                    "type": "buy",
+                    "currency": "USD",
+                    "security": {
+                        "ticker_symbol": "PLAID",
+                        "currency": "USD"
+                    }
+                }
+            ]
+        }
+    ]
+}

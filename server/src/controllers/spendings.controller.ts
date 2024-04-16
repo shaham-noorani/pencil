@@ -20,7 +20,7 @@ export const getSpendingsById = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE id = $1",
-      [req.params.id],
+      [req.params.id]
     );
     const spent = result.rows[0];
     if (!spent) {
@@ -36,7 +36,7 @@ export const getSpendingsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE user_id = $1",
-      [req.params.user_id],
+      [req.params.user_id]
     );
     const spent = result.rows[0];
     if (!spent) {
@@ -48,21 +48,24 @@ export const getSpendingsByUserId = async (req: Request, res: Response) => {
   }
 };
 
-export const getSpendingsByUserIdAndDateRange = async (req: Request, res: Response) => {
+export const getSpendingsByUserIdAndDateRange = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const result = await pool.query(
       "SELECT * FROM user_spendings WHERE user_id = $1 AND end_date >= $2 AND start_date <= $3 ORDER BY start_date",
-      [req.params.user_id, req.query.start_date, req.query.end_date],
+      [req.params.user_id, req.query.start_date, req.query.end_date]
     );
     const spent = result.rows;
 
-    if (!spent){
-      return res.status(404).json({message: "User Spendings not found"})
+    if (!spent) {
+      return res.status(404).json({ message: "User Spendings not found" });
     }
 
     res.status(200).json(result);
-  } catch (error: any){
-    res.status(500).json({message: error.message});
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -71,7 +74,7 @@ export const deleteSpendings = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_spendings WHERE id = $1 RETURNING *",
-      [req.params.id],
+      [req.params.id]
     );
     const spent = result.rows[0];
 
@@ -88,7 +91,7 @@ export const deleteSpendingsByUserId = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       "DELETE FROM user_spendings WHERE user_id = $1 RETURNING *",
-      [req.params.user_id],
+      [req.params.user_id]
     );
     const spent = result.rows[0];
 
@@ -111,7 +114,6 @@ export const createSpendingsController = async (
     const lr = await buildLinearRegression(req.body.user_id);
 
     res.status(201).json(spending);
-
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
