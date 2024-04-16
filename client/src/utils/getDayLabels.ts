@@ -1,4 +1,4 @@
-const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export const getDayLabels = (): string[] => {
   const todayIndex = new Date().getDay();
