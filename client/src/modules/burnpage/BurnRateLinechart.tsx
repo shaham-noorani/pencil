@@ -1,4 +1,4 @@
-import { Box, Center, Spinner } from "@chakra-ui/react";
+import { Box, Center, Spinner, Text } from "@chakra-ui/react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -7,6 +7,10 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
+import { useState } from "react";
+import "./Slider.css";
 
 interface LinechartBurnPageProps {
   loadingChart: boolean;
@@ -32,13 +36,33 @@ const BurnRateLinechart = ({
   projectedMayBalance,
   goalMayBalance,
 }: LinechartBurnPageProps) => {
+  const [startDate, setStartDate] = useState(new Date("2023-08-01").getTime());
+
+  const endDate = new Date("2024-05-10").getTime();
+
+  const filteredData = data.filter((d) => {
+    const date = new Date(d.date).getTime();
+    return date >= startDate && date <= endDate;
+  });
+
+  const onSliderChange = (value: number | number[]) => {
+    if (typeof value === "number") {
+      const newStartDate = new Date("2023-08-01").getTime() + value * 86400000; // value in days
+      setStartDate(newStartDate);
+    }
+  };
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const maxSliderDays =
+    (threeDaysAgo.getTime() - new Date("2023-08-01").getTime()) / 86400000;
+
   const yAxisDomain = [
     minValue - maxDifference * 0.3,
     maxValue + maxDifference * 0.3,
   ];
   const projectedLineColor =
     projectedMayBalance >= goalMayBalance ? "green" : "red";
-  const schoolEndDate = new Date("2024-05-01");
+  const schoolEndDate = new Date("2024-05-10");
   const augustStartDate = new Date("2023-08-01");
   if (loadingChart) {
     return (
@@ -52,11 +76,11 @@ const BurnRateLinechart = ({
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           key={maxDifference}
-          data={data}
+          data={filteredData}
           margin={{ right: 10, left: -50 }}
         >
           <XAxis
-            domain={[augustStartDate.getTime(), schoolEndDate.getTime()]}
+            domain={[startDate, endDate]}
             stroke="white"
             tick={false}
             dataKey="date"
@@ -71,7 +95,7 @@ const BurnRateLinechart = ({
                 projectedUserBalance: "Projected Balance",
               };
               const formattedValue =
-                value as number < 0
+                (value as number) < 0
                   ? `-$${Math.abs(value as number).toFixed(2)}`
                   : `$${Number(value).toFixed(2)}`;
               return [
@@ -101,6 +125,12 @@ const BurnRateLinechart = ({
           />
         </LineChart>
       </ResponsiveContainer>
+      <Slider
+        min={0}
+        max={maxSliderDays}
+        defaultValue={0}
+        onChange={onSliderChange}
+      />
     </Box>
   );
 };
