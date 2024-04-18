@@ -38,7 +38,7 @@ const BurnRateLinechart = ({
 }: LinechartBurnPageProps) => {
   const [startDate, setStartDate] = useState(new Date("2023-08-01").getTime());
 
-  const endDate = new Date("2024-05-01").getTime();
+  const endDate = new Date("2024-05-10").getTime();
 
   const filteredData = data.filter((d) => {
     const date = new Date(d.date).getTime();
@@ -62,7 +62,7 @@ const BurnRateLinechart = ({
   ];
   const projectedLineColor =
     projectedMayBalance >= goalMayBalance ? "green" : "red";
-  const schoolEndDate = new Date("2024-05-01");
+  const schoolEndDate = new Date("2024-05-10");
   const augustStartDate = new Date("2023-08-01");
   if (loadingChart) {
     return (

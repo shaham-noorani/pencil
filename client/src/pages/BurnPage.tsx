@@ -285,6 +285,7 @@ const BurnPage: React.FC = () => {
           mx={5}
           w={"93%"}
           bg="black"
+          h={"41%"}
         >
           <BurnRateOnTrack
             projectedSavings={projectedUserBalanceInMay}
