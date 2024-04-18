@@ -131,9 +131,6 @@ const BurnRateLinechart = ({
         defaultValue={0}
         onChange={onSliderChange}
       />
-      <Text color={"white"} textAlign={"center"}>
-        Zoom
-      </Text>
     </Box>
   );
 };
