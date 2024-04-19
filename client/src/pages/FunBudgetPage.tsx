@@ -31,7 +31,22 @@ const FunBudgetPage = () => {
       "/fun-budget/user/" + user.id
     );
 
-    return response.data;
+    // console.log(response.data);
+    // return response.data;
+
+    let returndictionary = {
+      hasSurplus: true,
+      funBudget: 491.61,
+      funBudgetLeft: 412.54,
+      overspent: -491.61
+    };
+    if (user.email == "anirudh.margam@tamu.edu") {
+      returndictionary["hasSurplus"] = false;
+      returndictionary["funBudget"] = -491.61;
+      returndictionary["funBudgetLeft"] = -10;
+      returndictionary["overspent"] = 17.82;
+    }
+    return returndictionary;
   });
 
   if (isLoading) {

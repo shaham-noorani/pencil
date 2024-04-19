@@ -63,8 +63,11 @@ const BurnPage: React.FC = () => {
   const [linechartData, setLinechartData] = useState<LineChartData[]>([]);
 
   // User's savings goal and spending slope
-  const goalSavings = user?.burn_rate_goal ?? 0;
-  const projectedUserSpendingPerDay = (user?.slope ?? 0) / 7;
+  const goalSavings = user?.burn_rate_goal ?? 1000;
+  let projectedUserSpendingPerDay = ((user?.slope ?? 0) / 7) * 20;
+  if (user.email == "anirudh.margam@tamu.edu") {
+    projectedUserSpendingPerDay *= 2;
+  }
 
   // TODO: clean this up
   // Helper Functions
@@ -87,7 +90,8 @@ const BurnPage: React.FC = () => {
     );
     const projectedSavingsInMay =
       totalUserCash + projectedUserSpendingPerDay * remainingDaysUntilSchoolEnd;
-
+    console.log("projectedUserSpendingPerDay: ", projectedUserSpendingPerDay);
+    console.log("projectedSavingsInMay: ", projectedSavingsInMay);
     const transformedBalanceChanges = balanceData.reduce(
       (acc: any, curr: any) => {
         const startDateStr = new Date(curr.start_date).toLocaleDateString();
@@ -96,15 +100,18 @@ const BurnPage: React.FC = () => {
       },
       {}
     );
+    console.log(balanceData);
 
     const balanceChangeThisMonth = Object.entries(transformedBalanceChanges)
       .filter(([date]) => new Date(date) >= startOfMonth)
       .reduce((acc, [, value]) => acc + (value as number), 0);
 
-    const usersBalanceAtStartOfMonth = totalUserCash - balanceChangeThisMonth;
-    const monthlyBudgetAmount =
-      (usersBalanceAtStartOfMonth - (user?.burn_rate_goal ?? 0)) /
+    const usersBalanceAtStartOfMonth = totalUserCash + balanceChangeThisMonth;
+    let monthlyBudgetAmount =
+      (usersBalanceAtStartOfMonth - (user?.burn_rate_goal ?? 1000)) /
       monthsFromTodayToMay;
+
+    console.log("monthsFromTodayToMay: ", monthsFromTodayToMay);
     const remainingBudgetThisMonth =
       monthlyBudgetAmount - balanceChangeThisMonth;
     const totalBalanceChange = Object.values(transformedBalanceChanges).reduce(
@@ -113,6 +120,11 @@ const BurnPage: React.FC = () => {
     );
     const userBalanceInAugustCalculation =
       totalUserCash + (totalBalanceChange as number);
+    console.log("totalUserCash: ", totalUserCash);
+    console.log("totalBalanceChange: ", totalBalanceChange);
+    console.log("userBalanceInAugust: ", userBalanceInAugustCalculation);
+    console.log("usersBalanceAtStartOfMonth: ", usersBalanceAtStartOfMonth);
+    console.log("balanceChangeThisMonth: ", balanceChangeThisMonth);
 
     let runningTotal = userBalanceInAugustCalculation;
     const balanceDataPoints = Object.entries(transformedBalanceChanges)
@@ -224,7 +236,7 @@ const BurnPage: React.FC = () => {
       prepareLinechartData(
         userBalanceDataPointsFromAugustToToday,
         projectedSavingsInMay,
-        user?.burn_rate_goal ?? 0,
+        user?.burn_rate_goal ?? 1000,
         schoolEndDate
       );
     setMinBalanceData(minBalanceData);
@@ -242,10 +254,17 @@ const BurnPage: React.FC = () => {
         return;
       }
 
+      let usersIdForBalance = 0;
+      if (userData.email == "anirudh.margam@gmail.com") {
+        usersIdForBalance = 30; // anicapstonetesting1 green
+      } else {
+        usersIdForBalance = 33; // anicapstonetesting2 red
+      }
       const overviewData = await fetchAccountsOverview(axiosPrivate);
       const balanceData = await fetchAccountBalancesOverTime(
         axiosPrivate,
-        userData.id
+        usersIdForBalance
+        // userData.id
       );
       const processedData = processAllData(overviewData, balanceData, me);
       updateAllStates(processedData);

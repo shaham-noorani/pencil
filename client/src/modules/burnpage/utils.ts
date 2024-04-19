@@ -6,7 +6,7 @@ export const remainingDaysUntilSchoolEnd = Math.ceil(
 );
 
 export const monthsFromTodayToMay =
-  1 + differenceInCalendarMonths(schoolEndDate, new Date(today));
+  Math.max(1, differenceInCalendarMonths(schoolEndDate, new Date(today)));
 
 export const startOfMonth = new Date(
   new Date().getFullYear(),

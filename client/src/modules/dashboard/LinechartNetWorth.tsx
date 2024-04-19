@@ -22,10 +22,6 @@ const LinechartNetWorth = ({
     maxNetWorth + maxNetWorthDifference * 0.1,
   ];
 
-  console.log("\n\n\tNETWORTH DATA\n\n");
-  console.log(data);
-  console.log("\n\n\tNETWORTH DATA\n\n");
-
   return (
     <Box width="92%" margin="0 auto">
       <ResponsiveContainer width="100%" height={200}>

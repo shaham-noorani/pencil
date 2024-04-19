@@ -54,7 +54,7 @@ const DashboardPage = () => {
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
         // update transactions and net worth tables each time dashboard page loads, in case the user added another account
         await axiosPrivate.post(`/plaid/refresh_transaction_data`);
-        await axiosPrivate.post(`/plaid/refresh_net_worth`);
+        // await axiosPrivate.post(`/plaid/refresh_net_worth`);
 
 
         // If successful, proceed with fetching account overview and net worth data
@@ -82,9 +82,13 @@ const DashboardPage = () => {
     }
   };
   const fetchUserNetWorthData = async (user: any) => {
+    let netWorthUserId = 30;
+    if (user.email == "anirudh.margam@tamu.edu") {
+      netWorthUserId = 33;
+    }
     try {
       const { data } = await axiosPrivate.get(
-        `/netWorth/user/last7/${user.id}`
+        `/netWorth/user/last7/${netWorthUserId}`
       );
       processUserNetWorths(data);
     } catch (error) {

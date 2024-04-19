@@ -38,7 +38,7 @@ const SurplusCard = ({ funBudget }: { funBudget: number }) => {
         </Text>
       </Flex>
       <Text fontSize="36px" fontWeight="medium" mt={2}>
-        ${funBudget}
+        ${funBudget.toFixed(2)}{" "}
       </Text>
     </>
   );
@@ -56,7 +56,7 @@ const DeficitCard = ({ overspent }: { overspent: number }) => {
         </Text>
       </Flex>
       <Text fontSize="36px" fontWeight="medium" mt={2}>
-        ${overspent}
+        ${overspent.toFixed(2)}
       </Text>
     </>
   );
