@@ -70,7 +70,32 @@ export const getUserFunBudget = async (req: Request, res: Response) => {
 
     let hasSurplus = last_month - desired_amount > 0;
     let fb = Math.max(last_month - desired_amount, 0);
-    let fb_left = fb;
+
+    //Get spent amount this month
+    let zero_prefix = "";
+    if (month < 10) {
+      zero_prefix = "0";
+    }
+    let month_str = String(year) + "-" + zero_prefix + String(month) + "-01";
+
+    //Calculate Starting Amount (Amount on August 1st)
+    const result_month = await pool.query(
+      "SELECT * FROM user_spendings WHERE user_id = $1 AND start_date >= $2",
+      [req.params.user_id, month_str]
+    );
+
+    const spent_month = result.rows;
+    let spent_this_month = 0;
+    for (let i = 0; i < spent.length; i++) {
+      spent_this_month += spent_month[i]["spent_amount"];
+    }
+
+    let fb_left = Math.min(
+      fb,
+      (starting_amount - brg) / 10 - spent_this_month + fb
+    );
+    fb_left = Math.max(fb_left, 0);
+
     let overspent = Math.min(last_month - desired_amount, 0);
 
     res.status(200).json({
@@ -78,6 +103,7 @@ export const getUserFunBudget = async (req: Request, res: Response) => {
       funBudget: fb,
       funBudgetLeft: fb_left,
       overspent: overspent,
+      monthlyRate: (starting_amount - brg) / 10,
     });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
