@@ -103,6 +103,7 @@ export const getUserFunBudget = async (req: Request, res: Response) => {
       funBudget: fb,
       funBudgetLeft: fb_left,
       overspent: overspent,
+      monthlyRate: (starting_amount - brg) / 10,
     });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
