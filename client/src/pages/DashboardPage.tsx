@@ -53,7 +53,7 @@ const DashboardPage = () => {
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
         // update transactions and net worth tables each time dashboard page loads, in case the user added another account
-        await axiosPrivate.post(`/plaid/refresh_transaction_data`);
+        // await axiosPrivate.post(`/plaid/refresh_transaction_data`);
         // await axiosPrivate.post(`/plaid/refresh_net_worth`);
 
 
