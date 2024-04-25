@@ -14,6 +14,7 @@ import NetWorthDataPoint from "../models/netWorthDataPoint.model";
 import AccountsOverview from "../models/accountsOverview.model";
 import BankAccountBase from "../models/bankAccountBase.model";
 import PlaidLink from "../modules/auth/PlaidLink";
+import { useLocation } from 'react-router-dom';
 
 const DashboardPage = () => {
   const me = useMe();
@@ -21,6 +22,7 @@ const DashboardPage = () => {
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
+  const location = useLocation();
 
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<BankAccountBase[]>([]);
@@ -47,6 +49,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true);
       try {
         const user = await me();
         setUserId(user.id as string);
@@ -71,7 +74,7 @@ const DashboardPage = () => {
     };
 
     loadData();
-  }, []);
+  }, [location.state]);
 
   const fetchAccountsOverview = async () => {
     try {

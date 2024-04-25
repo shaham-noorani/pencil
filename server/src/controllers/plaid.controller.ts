@@ -69,19 +69,20 @@ export const refreshPlaidNetWorth = async (req: Request, res: Response) => {
         const account = accounts[i] as PlaidAccount;
 
         if (account.type == AccountType.Credit || account.type == AccountType.Loan) {
-          if (account.balances.current) {
-            net_worth -= account.balances.current;
+          if (account.balances.available) {
+            net_worth -= account.balances.available;
           }
         } else {
-          if (account.balances.current) {
-            net_worth += account.balances.current;
+          if (account.balances.available) {
+            net_worth += account.balances.available;
           }
         }
       }
     };
 
     const date = new Date();
-    date.setTime(0);
+    // date.setTime(0);
+    date.setHours(0, 0, 0, 0);
     const netWorthResult = await createOrUpdateNetWorth({
       id: 0,
       user_id: user.id,

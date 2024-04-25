@@ -34,6 +34,7 @@ export const createOrUpdateNetWorth = async (
 export const createNetWorths = async (
   networth: NetWorth
 ): Promise<NetWorth> => {
+  console.log("starting createNetWorths function");
   let start_date = networth.start_date;
   let end_date = networth.end_date;
 
@@ -43,11 +44,13 @@ export const createNetWorths = async (
     start_date = new Date(end_date.getTime() - 1000 * 60 * 60 * 24 * 7);
   }
 
+  console.log("params are: ", start_date, end_date, networth.amount, networth.user_id);
   const result = await pool.query(
     "INSERT INTO user_net_worth (start_date, end_date, amount, user_id) VALUES ($1, $2, $3, $4) RETURNING *",
     [start_date, end_date, networth.amount, networth.user_id]
   );
   const spent = result.rows[0];
+  console.log("successfuly ran sql")
 
   return spent;
 };

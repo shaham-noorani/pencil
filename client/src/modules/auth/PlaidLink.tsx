@@ -33,8 +33,11 @@ const PlaidLink = ({ type }: PlaidLinkProps) => {
     const response = await axiosPrivate.post("/plaid/item_inital_setup", {
       public_token: temp_token,
     });
-    navigate("/dashboard");
-  }, []);
+    await axiosPrivate.post(`/plaid/refresh_transaction_data`);
+    await axiosPrivate.post(`/plaid/refresh_net_worth`);
+
+    navigate("/dashboard", { state: { refreshed: true } });
+  }, [navigate, axiosPrivate]);
 
   const config: Parameters<typeof usePlaidLink>[0] = {
     token: linkToken,
