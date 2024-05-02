@@ -50,14 +50,11 @@ const DashboardPage = () => {
       try {
         const user = await me();
         setUserId(user.id as string);
-        // Attempt to get the Plaid item for the user
+
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
-        // update transactions and net worth tables each time dashboard page loads, in case the user added another account
         await axiosPrivate.post(`/plaid/refresh_transaction_data`);
         await axiosPrivate.post(`/plaid/refresh_net_worth`);
 
-
-        // If successful, proceed with fetching account overview and net worth data
         await Promise.all([
           fetchAccountsOverview(),
           fetchUserNetWorthData(user),
@@ -109,7 +106,6 @@ const DashboardPage = () => {
     const minNetWorth = Math.min(...netWorthValues);
     const maxNetWorthDifference = maxNetWorth - minNetWorth;
 
-    // Fill in missing days with 0 if there are less than 7 days
     if (netWorthValues.length < 7) {
       for (let i = 0; i < 7; i++) {
         if (i > netWorthValues.length - 1) {

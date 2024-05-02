@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { pool } from "../db";
 
-//Get PlaidItems
 export const getAllNetWorths = async (req: Request, res: Response) => {
   try {
     const result = await pool.query("SELECT * FROM user_net_worth");
@@ -62,7 +61,6 @@ export const getLatest7NetWorthsByUserId = async (req: Request, res: Response) =
   }
 };
 
-//Delete Spendings
 export const deleteNetWorth = async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
@@ -97,7 +95,6 @@ export const deleteNetWorthByUserId = async (req: Request, res: Response) => {
   }
 };
 
-//Create Spendings
 export const createNetWorth = async (req: Request, res: Response) => {
   try {
     let start_date = req.body.start_date;

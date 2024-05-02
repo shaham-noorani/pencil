@@ -6,10 +6,9 @@ import LoginButton from "../modules/auth/LoginButton";
 const LoginPage = () => {
   const [stage, setStage] = useState(0);
 
-  // handle stage transition
   useEffect(() => {
     const initialTimeout = setTimeout(() => {
-      setStage(1); // Transition to stage 1 after 2s
+      setStage(1);
 
       const stage1Timeout = setTimeout(() => {
         setStage(2);
@@ -18,8 +17,8 @@ const LoginPage = () => {
           setStage(3);
         }, 1500);
 
-        return () => clearTimeout(stage2Timeout); // Clean up timeout when component unmounts or updates
-      }, 1500); // Delay for stage 1 to stage 2
+        return () => clearTimeout(stage2Timeout);
+      }, 1500); 
 
       return () => clearTimeout(stage1Timeout);
     }, 2000);
