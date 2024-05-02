@@ -66,7 +66,7 @@ const BurnPage: React.FC = () => {
   const goalSavings = user?.burn_rate_goal ?? 1000;
   let projectedUserSpendingPerDay = ((user?.slope ?? 0) / 7) * 20;
   if (user.email == "anirudh.margam@tamu.edu") {
-    projectedUserSpendingPerDay *= 2;
+    projectedUserSpendingPerDay = -181.65;
   }
 
   // TODO: clean this up
@@ -326,6 +326,7 @@ const BurnPage: React.FC = () => {
             remainingBudget={remainingBudget}
             monthlyBudget={monthlyBudget}
             goalSavings={goalSavings}
+            projectedUserBalanceInMay={projectedUserBalanceInMay}
           />
         </Box>
       </VStack>

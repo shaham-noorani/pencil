@@ -36,15 +36,15 @@ const FunBudgetPage = () => {
 
     let returndictionary = {
       hasSurplus: true,
-      funBudget: 491.61,
-      funBudgetLeft: 412.54,
-      overspent: -491.61
+      funBudget: 592.72,
+      funBudgetLeft: 592.72,
+      overspent: -592.72
     };
     if (user.email == "anirudh.margam@tamu.edu") {
       returndictionary["hasSurplus"] = false;
-      returndictionary["funBudget"] = -491.61;
+      returndictionary["funBudget"] = -10;
       returndictionary["funBudgetLeft"] = -10;
-      returndictionary["overspent"] = 17.82;
+      returndictionary["overspent"] = 287.55;
     }
     return returndictionary;
   });

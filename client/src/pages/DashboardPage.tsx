@@ -21,6 +21,7 @@ const DashboardPage = () => {
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
 
   const [stage, setStage] = useState(0);
   const [cashAccounts, setCashAccounts] = useState<BankAccountBase[]>([]);
@@ -50,6 +51,7 @@ const DashboardPage = () => {
       try {
         const user = await me();
         setUserId(user.id as string);
+        setUserEmail(user.email as string);
         // Attempt to get the Plaid item for the user
         await axiosPrivate.get(`/plaidItem/user/${user.id}`);
         // update transactions and net worth tables each time dashboard page loads, in case the user added another account
@@ -193,13 +195,14 @@ const DashboardPage = () => {
 
   return (
     <VStack
-      height="100vh"
+      minHeight="100vh"
       width="100vw"
       bg="#222222"
       justifyContent="flex-start"
+      overflowY={"auto"}
     >
       <Box className={`dashboard-box-header stage${stage}`} width="full">
-        <HeaderNetWorth userId={userId}/>
+        <HeaderNetWorth userId={userId} userEmail={userEmail}/>
       </Box>
       <Box className={`dashboard-box-middle stage${stage}`} width="full">
         <Box className={`dashboard-box-net-worth stage${stage}`} width="100vw">

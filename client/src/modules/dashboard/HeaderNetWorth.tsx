@@ -4,9 +4,10 @@ import DeleteUserButton from "./DeleteUserButton";
 
 interface HeaderNetWorthProps {
   userId: string;
+  userEmail: string;
 }
 
-const HeaderNetWorth: React.FC<HeaderNetWorthProps> = ({ userId }) => {
+const HeaderNetWorth: React.FC<HeaderNetWorthProps> = ({ userId, userEmail }) => {
   const today = format(new Date(), "EEEE, MMMM do");
 
   return (
@@ -23,7 +24,7 @@ const HeaderNetWorth: React.FC<HeaderNetWorthProps> = ({ userId }) => {
         <Text fontSize="3xl" fontWeight="bold">
           Home
         </Text>
-        <DeleteUserButton userId={userId} />
+        <DeleteUserButton userId={userId} userEmail={userEmail} />
       </Flex>
       <Text fontSize="md">{today}</Text>
     </Flex>

@@ -33,7 +33,7 @@ const SurplusCard = ({ funBudget }: { funBudget: number }) => {
           🎉
         </Text>
         <Text mt={2}>
-          Woohoo! You can spend a total of this much on something new this
+          Woohoo! You can spend a total of this much on something fun this
           month!
         </Text>
       </Flex>
@@ -52,7 +52,7 @@ const DeficitCard = ({ overspent }: { overspent: number }) => {
           😳
         </Text>
         <Text mt={2}>
-          Unfortunately, you missed your budget target by this much this month
+          Unfortunately, you missed your budget target by this much last month.
         </Text>
       </Flex>
       <Text fontSize="36px" fontWeight="medium" mt={2}>

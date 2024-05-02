@@ -5,6 +5,7 @@ interface BalanceBudgetGoalBoxProps {
   monthlyBudget: number;
   remainingBudget: number;
   goalSavings: number;
+  projectedUserBalanceInMay: number;
 }
 
 const BalanceBudgetGoalBox = ({
@@ -12,7 +13,13 @@ const BalanceBudgetGoalBox = ({
   monthlyBudget,
   remainingBudget,
   goalSavings,
+  projectedUserBalanceInMay,
 }: BalanceBudgetGoalBoxProps) => {
+  let goalColor: string = "green.500";
+  if (projectedUserBalanceInMay < goalSavings) {
+    goalColor = "red.500";
+  }
+
   return (
     <Box
       backgroundColor="#000000"
@@ -21,40 +28,42 @@ const BalanceBudgetGoalBox = ({
       color="white"
       mx={3}
     >
-      <Grid templateColumns="auto 1fr auto" gap={4}>
-        <Flex alignItems="center" justifyContent="center" height="100%">
-          <Circle size="8px" bg="red.500" />
-        </Flex>
-        <Flex alignItems="center">
-          <Text fontWeight="semibold">Current Balance</Text>
-        </Flex>
-        <Flex alignItems="center" justifyContent="flex-end">
+      <Grid templateRows="repeat(4, 1fr)" gap={2}>
+        {/* Current Balance */}
+        <Flex justifyContent="space-between" alignItems="center">
+          <Flex alignItems="center">
+            <Circle size="8px" bg={"yellow"} mr={2} />
+            <Text fontWeight="semibold">Current Balance</Text>
+          </Flex>
           <Text fontWeight="bold">${currentBalance.toFixed(2)}</Text>
         </Flex>
 
-        <Flex alignItems="center" justifyContent="center" height="100%">
-          <Circle size="8px" bg="green.500" />
-        </Flex>
-        <Flex alignItems="center">
-          <Text fontWeight="semibold">Monthly Budget</Text>
-        </Flex>
-        <Flex alignItems="center" justifyContent="flex-end">
+        {/* Monthly Budget */}
+        <Flex justifyContent="space-between" alignItems="center">
+          <Flex alignItems="center">
+            <Circle size="8px" bg={"#000000"} mr={2} />
+            <Text fontWeight="semibold">Monthly Budget</Text>
+          </Flex>{" "}
           <Text fontWeight="bold">${monthlyBudget.toFixed(2)}</Text>
         </Flex>
 
-        <Box />
-        <Flex direction="column">
-          <Text fontWeight="semibold">Remaining Budget</Text>
+        {/* Remaining Budget */}
+        <Flex justifyContent="space-between" alignItems="center">
+          <Flex alignItems="center">
+            <Circle size="8px" bg={"#000000"} mr={2} />
+            <Text fontWeight="semibold">Remaining Budget</Text>
+          </Flex>{" "}
+          <Text fontWeight="bold">${remainingBudget.toFixed(2)}</Text>
         </Flex>
-        <Text textAlign="right" fontWeight="bold">
-          ${remainingBudget.toFixed(2)}
-        </Text>
 
-        <Box />
-        <Text fontWeight="semibold">Goal Savings</Text>
-        <Text textAlign="right" fontWeight="bold">
-          ${goalSavings.toFixed(2)}
-        </Text>
+        {/* Goal Savings */}
+        <Flex justifyContent="space-between" alignItems="center">
+          <Flex alignItems="center">
+            <Circle size="8px" bg={goalColor} mr={2} />
+            <Text fontWeight="semibold">Goal Savings</Text>
+          </Flex>
+          <Text fontWeight="bold">${goalSavings.toFixed(2)}</Text>
+        </Flex>
       </Grid>
     </Box>
   );

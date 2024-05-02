@@ -6,9 +6,10 @@ import { useNavigate } from "react-router-dom";
 
 interface DeleteUserButtonProps {
   userId: string;
+  userEmail: string;
 }
 
-const DeleteUserButton: React.FC<DeleteUserButtonProps> = ({ userId }) => {
+const DeleteUserButton: React.FC<DeleteUserButtonProps> = ({ userId, userEmail }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const toast = useToast();
@@ -20,7 +21,7 @@ const DeleteUserButton: React.FC<DeleteUserButtonProps> = ({ userId }) => {
       await axiosPrivate.delete(`/user/${userId}`);
       toast({
         title: 'User deleted',
-        description: `The user with ID ${userId} has been successfully deleted.`,
+        description: `The user with email ${userEmail} has been successfully deleted.`,
         status: 'success',
         duration: 9000,
         isClosable: true,
