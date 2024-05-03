@@ -109,10 +109,9 @@ export const getInstitutionNameForPlaidToken = async (token: string) => {
 };
 
 export const getSundayOfWeek = (date: Date): Date => {
-  const dayOfWeek = date.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-  const diff = date.getDate() - dayOfWeek; // Subtract the current day of the week to get Sunday
+  const dayOfWeek = date.getDay();
+  const diff = date.getDate() - dayOfWeek;
 
-  // Create a new Date object with the corresponding Sunday
   const sunday = new Date(date);
   sunday.setDate(diff);
   sunday.setHours(0, 0, 0, 0);
@@ -184,10 +183,9 @@ export const getSyncedTransactions = async(token: string, user_id: number, curso
 
         const response = await client.transactionsSync(request);
         const data = response.data;
-        // Add this page of results
+
         added = added.concat(data.added);
         hasMore = data.has_more;
-        // Update cursor to the next cursor
         curr_cursor = data.next_cursor;
     }
 
@@ -207,7 +205,6 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
     let earliest_sunday = new Date();
     transactions.forEach(transaction => {
         const date = new Date(transaction.date);
-        //console.log(date);
         const sunday = getSundayOfWeek(date);
         if (sunday < earliest_sunday) {
             earliest_sunday = new Date(sunday);
@@ -218,12 +215,10 @@ export const addTransactionArrayToSpendings = async (user_id: number, transactio
         }
         groupedTransactions[sunday.toDateString()] += transaction.amount;
     });
-    //console.log(groupedTransactions);
 
     let start_sunday = getSundayOfWeek(earliest_sunday);
     const curr_sunday = getSundayOfWeek(new Date());
 
-    //console.log(groupedTransactions);
     while (curr_sunday >= start_sunday) {
         let amount: number = 0;
         if (curr_sunday.toDateString() in groupedTransactions) {

@@ -1,18 +1,18 @@
 .rc-slider-track {
-    background-color: yellow !important; /* Highlight color */
+    background-color: yellow !important;
 }
 .rc-slider-rail {
-    height: 1px; /* Adjust this value to change the thickness */
-    background-color: #ccc; /* Optional: change to match your design */
+    height: 1px; 
+    background-color: #ccc; 
 }
 .rc-slider-handle:active,
 .rc-slider-handle:focus,
 .rc-slider-handle:hover {
-    border-color: yellow !important; /* Handle color when active/focused/hovered */
+    border-color: yellow !important;
 }
 
 .rc-slider-handle {
-    border-color: yellow !important; /* Handle color */
-    box-shadow: 0 0 5px yellow; /* Glowing effect */
+    border-color: yellow !important;
+    box-shadow: 0 0 5px yellow;
     margin-top: -6px;
 }

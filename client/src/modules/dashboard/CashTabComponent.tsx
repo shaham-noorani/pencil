@@ -86,10 +86,8 @@ const CashTabComponent = ({
 export default CashTabComponent;
 
 function formatCurrency(value: number) {
-  // Check if the number is an integer
   const isInteger = Number.isInteger(value);
 
-  // If it's an integer, use no decimal places; otherwise, use two.
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',

@@ -1,4 +1,3 @@
-/* LoginPage.css */
 .login-button {
   display: flex;
   width: 50%;
@@ -49,7 +48,6 @@
   z-index: 1;
 }
 
-/* Styles specific to stage0 */
 .circle-container.stage0 {
   display: flex;
   align-items: flex-start;
@@ -61,12 +59,12 @@
 }
 
 .red-circle.stage0 {
-  margin-right: 8px; /* Adjust the space between circles as needed */
+  margin-right: 8px;
   opacity: 1;
 }
 
 .gray-circle.stage0 {
-  margin-right: 8px; /* Adjust the space between circles as needed */
+  margin-right: 8px;
   opacity: 1;
 }
 
@@ -74,7 +72,6 @@
   opacity: 1;
 }
 
-/* Styles specific to stage1 */
 @keyframes moveRedCircleToStage1 {
   from {
     transform: translate(0, 0);
@@ -221,7 +218,6 @@
   animation: moveLetterPToStage1 1s forwards;
 }
 
-/* Styles specific to stage2 */
 .logoLetterL.stage2,
 .logoLetterI.stage2,
 .logoLetterC.stage2,
@@ -299,7 +295,6 @@
   animation: moveYellowCircleToStage2 1s forwards;
 }
 
-/* Styles specific to stage3 */
 @keyframes fadeLoginButtonIntoExistence {
   from {
     opacity: 0;
